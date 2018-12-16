@@ -1,4 +1,4 @@
-const existsSync = require("fs");
+const fs = require("fs");
 const mqtt = require("mqtt");
 const moment = require("moment");
 const train = require ("./consumers/train");
@@ -15,7 +15,7 @@ function main() {
         if (parameter.match(regex) && moment(process.argv[2], "YYYY-MM-DD", true).isValid() ) {
             downloadTrainsByDate(parameter);
             downloadCompositionsByDate(parameter);
-        } else if (existsSync(parameter)) {
+        } else if (fs.existsSync(parameter)) {
             loadTrainsFromFile(parameter);
             loadCompositionsFromFile(parameter);
         } else {
@@ -81,9 +81,13 @@ function listenRataMQTT() {
 
     client.on("message", function(topic, message) {
         if (topic.startsWith("trains")) {
-            train.processMessage(message);
+            train.processMessage(message, function() {
+                // Done
+            });
         } else if (topic.startsWith("compositions")) {
-            composition.processMessage(message);
+            composition.processMessage(message, function() {
+                // Done
+            });
         } else {
             console.error(moment().toISOString(), "MQTT: Message from unknown topic:", topic);
         }
