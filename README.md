@@ -1,2 +1,2 @@
-# digitraffic-client
-Digitraffic client
+# rata-client
+Client program for rata.digitraffic.fi.
