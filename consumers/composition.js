@@ -1,15 +1,16 @@
 /*
 Process composition messages.
 */
-var p = require("../pgconn");
+const p = require("../pgconn");
 const u = require ("../utils");
 const moment = require("moment");
+const async = require("async");
 
 // Reusable set of columns
 const cs_compositions = new p.pgp.helpers.ColumnSet(["train_number", "departure_date"],
     {schema: "rail", table: "compositions"});
 
-    exports.processMessage = function(body, callback) {
+exports.processMessage = function(body, callback) {
     let data;
 
     try {
@@ -23,7 +24,7 @@ const cs_compositions = new p.pgp.helpers.ColumnSet(["train_number", "departure_
             next();
         });
     }, function(err) {
-        return callback();
+        callback();
     });
 }
 
