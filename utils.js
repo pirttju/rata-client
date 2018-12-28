@@ -3,10 +3,6 @@
  */
 var exports = module.exports = {};
 
-var request = require("request"),
-    zlib = require("zlib"),
-    moment = require("moment-timezone");
-
 /**
  * Filters
  */
