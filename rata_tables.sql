@@ -73,6 +73,7 @@ CREATE TABLE rata.compositions (
     wagons              jsonb,
     total_length        smallint,
     maximum_speed       smallint,
+    last_modified       timestamptz,
     PRIMARY KEY (train_number, departure_date, journey_index)
 );
 
