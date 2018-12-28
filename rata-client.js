@@ -1,47 +1,56 @@
+const async = require("async");
 const fs = require("fs");
-const mqtt = require("mqtt");
 const moment = require("moment");
+const mqtt = require("mqtt");
 const train = require ("./consumers/train");
 const composition = require("./consumers/composition");
 
-global.rataMQTTDisconnected = false;
+let rataMQTTDisconnected = false;
 
-function main() {
-    let parameter;
-
+function main(callback) {
+    // Check for json file given as command line parameter
     if (process.argv.length > 2) {
-        parameter = process.argv[2];
-        regex = /^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
-        if (parameter.match(regex) && moment(process.argv[2], "YYYY-MM-DD", true).isValid() ) {
-            downloadTrainsByDate(parameter);
-            downloadCompositionsByDate(parameter);
-        } else if (fs.existsSync(parameter)) {
-            loadTrainsFromFile(parameter);
-            loadCompositionsFromFile(parameter);
-        } else {
-            console.error("Unknown parameter");
-            process.exit(1);
-        }
+        handleFile(process.argv[2], function(err) {
+            // Done
+            callback();
+        });
     } else {
-        // No parameters given, start automatic updating
+        // No parameter given - open MQTT connection
         listenRataMQTT();
     }
 }
 
-function downloadTrainsByDate(date) {
-    // TODO
-}
+function handleFile(fileName, callback) {
+    fs.readFile(fileName, function(err, data) {
+        if (err) {
+            callback("Could not read file!");
+        } else {
+            try {
+                json = JSON.parse(data);
+            } catch (e) {
+                callback("JSON parse failed!");
+            }
 
-function downloadCompositionsByDate(date) {
-    // TODO
-}
+            async.eachSeries(json, function(item, next) {
+                let fileType = "?";
 
-function loadTrainsFromFile(fileName) {
-    // TODO
-}
+                if (item.timeTableRows) {
+                    fileType = "trains";
+                }
+    
+                if (item.journeySections) {
+                    fileType = "compositions";
+                }
 
-function loadCompositionsFromFile(fileName) {
-    // TODO
+                processMessage(fileType, item, function(err) {
+                    if (err) console.log(moment().toISOString(), err);
+                    next();
+                });
+            }, function(err) {
+                callback(null);
+            });
+        }
+    });
 }
 
 function listenRataMQTT() {
@@ -80,18 +89,35 @@ function listenRataMQTT() {
     });
 
     client.on("message", function(topic, message) {
-        if (topic.startsWith("trains")) {
-            train.processMessage(message, function() {
-                // Done
-            });
-        } else if (topic.startsWith("compositions")) {
-            composition.processMessage(message, function() {
-                // Done
-            });
-        } else {
-            console.error(moment().toISOString(), "MQTT: Message from unknown topic:", topic);
+        try {
+            json = JSON.parse(message);
+        } catch (e) {
+            console.log(moment().toISOString(), "JSON parse failed");
         }
+
+        processMessage(topic, json, function() {
+            // Done
+        });
     });
 }
 
-main();
+function processMessage(topic, json, callback) {
+    if (topic.startsWith("trains")) {
+        train.processMessage(json, function(err) {
+            callback(err);
+        });
+    } else if (topic.startsWith("compositions")) {
+        composition.processMessage(json, function(err) {
+            callback(err);
+        });
+    }
+}
+
+main(function(err) {
+    if (err) {
+        console.log(err);
+        process.exit(1);
+    } else {
+        process.exit(0);
+    }
+});
