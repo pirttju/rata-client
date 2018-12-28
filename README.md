@@ -4,7 +4,7 @@ Stores trains and compositions into PostgreSQL database.
 
 Usage
 
-node rata-client.js <fileName>
+node rata-client.js fileName
 
 imports JSON from fileName if passed
 
