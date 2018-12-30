@@ -77,6 +77,38 @@ CREATE TABLE rata.compositions (
     PRIMARY KEY (train_number, departure_date, journey_index)
 );
 
+CREATE TABLE rata.trainlocations (
+    train_number        int NOT NULL,
+    departure_date      date NOT NULL,
+    description         text NOT NULL,
+    timestamp           timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    geom                geometry(Point,4326) NOT NULL,
+    speed               smallint,
+    bearing             smallint,
+    track_section       text,
+    data_source         text,
+    PRIMARY KEY (train_number, departure_date)
+);
+
+-- bearing is not supplied from the train-location feed so we have to calculate it
+CREATE OR REPLACE FUNCTION set_bearing() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (ST_Equals(OLD.geom, NEW.geom)) THEN
+        NEW."bearing" := OLD."bearing";
+    ELSE
+        NEW."bearing" := round(ST_Azimuth(OLD."geom", NEW."geom")/(2*pi())*360);
+    END IF;
+    RETURN NEW;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER set_bearing
+BEFORE UPDATE ON rata.trainlocations
+FOR EACH ROW EXECUTE PROCEDURE set_bearing();
+
+-- create timescaledb tables
 SELECT create_hypertable('rata.trains', 'departure_date');
 SELECT create_hypertable('rata.timetablerows', 'departure_date');
 SELECT create_hypertable('rata.compositions', 'departure_date');

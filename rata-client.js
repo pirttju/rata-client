@@ -3,6 +3,7 @@ const fs = require("fs");
 const moment = require("moment");
 const mqtt = require("mqtt");
 const train = require ("./consumers/train");
+const trainlocation = require ("./consumers/trainlocation");
 const composition = require("./consumers/composition");
 
 let rataMQTTDisconnected = false;
@@ -63,7 +64,7 @@ function listenRataMQTT() {
             console.log(moment().toISOString(), "MQTT: Connected.");
 
             // Listen trains
-            client.subscribe(["trains/#", "compositions/#"], function(err) {
+            client.subscribe(["trains/#", "compositions/#", "train-locations/#"], function(err) {
                 if (!err) {
                     console.log(moment().toISOString(), "MQTT: Subscribed.");
                     rataMQTTDisconnected = false;
@@ -95,8 +96,8 @@ function listenRataMQTT() {
             console.log(moment().toISOString(), "JSON parse failed");
         }
 
-        processMessage(topic, json, function() {
-            // Done
+        processMessage(topic, json, function(err) {
+            if (err) console.log(moment().toISOString(), topic, err);
         });
     });
 }
@@ -104,6 +105,10 @@ function listenRataMQTT() {
 function processMessage(topic, json, callback) {
     if (topic.startsWith("trains")) {
         train.processMessage(json, function(err) {
+            callback(err);
+        });
+    } else if (topic.startsWith("train-locations")) {
+        trainlocation.processMessage(json, function(err) {
             callback(err);
         });
     } else if (topic.startsWith("compositions")) {

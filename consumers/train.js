@@ -17,14 +17,20 @@ exports.processMessage = function(json, callback) {
     prepareTrain(json, function(err, data) {
         if (err) return callback(err);
 
+        // Delete old train (if any) if the timetable is less than one minute old
+        const dNow = new Date().getTime();
+        const dTrain = new Date(data.train.acceptance_date).getTime();
+
+        if ((dNow - dTrain) < 60000) {
+            data.deleteOld = true;
+        } else {
+            data.deleteOld = false;
+        }
+
+        // Upsert train to the database
         upsert(data, function (err, results) {
-            // Done
-            if (err) {
-                console.log(err);
-            }
-            if (data.timeTableRows.length != results[1].rowCount) {
-                console.log(moment().toISOString(), data.train.train_number, data.train.departure_date, "length of data:", data.timeTableRows.length, ", rows updated:", results[1].rowCount);
-            }
+            if (err) return callback(err);
+
             callback();
         });
     });
@@ -146,17 +152,27 @@ function prepareTrain(data, callback) {
 
 function upsert(data, callback) {
     p.db.task(t => {
-        const q1 = t.result(p.pgp.helpers.insert(data.train, cs_trains) +
-        " ON CONFLICT(train_number, departure_date) DO UPDATE SET " +
-            cs_trains.assignColumns({from: 'EXCLUDED', skip: ["train_number", "departure_date"]}));
-        const q2 = t.result(p.pgp.helpers.insert(data.timeTableRows, cs_timetable_rows) +
-        " ON CONFLICT(train_number, departure_date, row_index) DO UPDATE SET " +
-            cs_timetable_rows.assignColumns({from: 'EXCLUDED', skip: ["train_number", "departure_date", "row_index"]}));
+        const queries = [];
 
-        return t.batch([q1, q2]);
+        if (data.deleteOld) {
+            queries.push(t.none("DELETE FROM rata.trains WHERE train_number = $1 AND departure_date = $2", [data.train.train_number, data.train.departure_date]));
+            queries.push(t.none("DELETE FROM rata.timetablerows WHERE train_number = $1 AND departure_date = $2", [data.train.train_number, data.train.departure_date]));
+        }
+
+        const q1 = t.none(p.pgp.helpers.insert(data.train, cs_trains) +
+            " ON CONFLICT(train_number, departure_date) DO UPDATE SET " +
+            cs_trains.assignColumns({from: 'EXCLUDED', skip: ["train_number", "departure_date"]}));
+        queries.push(q1);
+
+        const q2 = t.none(p.pgp.helpers.insert(data.timeTableRows, cs_timetable_rows) +
+            " ON CONFLICT(train_number, departure_date, row_index) DO UPDATE SET " +
+            cs_timetable_rows.assignColumns({from: 'EXCLUDED', skip: ["train_number", "departure_date", "row_index"]}));
+        queries.push(q2);
+
+        return t.batch(queries);
     })
-    .then(data => {
-        return callback(null, data);
+    .then(() => {
+        return callback(null);
     })
     .catch(error => {
         return callback(error);
