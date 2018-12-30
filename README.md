@@ -4,9 +4,11 @@ Stores trains and compositions into PostgreSQL database. Requires TimescaleDB ex
 
 Usage
 
+node rata-client.js
+
+listens updates over MQTT
+
+
 node rata-client.js fileName
 
-imports JSON from fileName if passed
-
-otherwise listens live-trains on MQTT connection
-  
+imports trains or compositions JSON dump from fileName
