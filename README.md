@@ -1,6 +1,6 @@
 # rata-client
 Client program for rata.digitraffic.fi.
-Stores trains and compositions into PostgreSQL database. Requires TimescaleDB extension.
+Stores trains, compositions and active GPS locations into PostgreSQL database. Requires TimescaleDB extension.
 
 Usage
 
