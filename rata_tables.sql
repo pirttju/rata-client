@@ -58,7 +58,7 @@ CREATE TABLE rata.timetablerows (
 
 CREATE INDEX ON rata.timetablerows (station);
 CREATE INDEX ON rata.timetablerows (DATE(arr_scheduled AT TIME ZONE 'Europe/Helsinki')) WHERE arr_scheduled IS NOT NULL;
-CREATE INDEX ON rata.timetablerows (DATE(dep_scheduled AT TIME ZONE 'Europe/Helsinki')) WHERE arr_scheduled IS NOT NULL;
+CREATE INDEX ON rata.timetablerows (DATE(dep_scheduled AT TIME ZONE 'Europe/Helsinki')) WHERE dep_scheduled IS NOT NULL;
 
 CREATE TABLE rata.compositions (
     train_number        int NOT NULL,
