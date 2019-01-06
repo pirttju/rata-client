@@ -19,6 +19,7 @@ CREATE TABLE rata.trains (
     end_station         text NOT NULL,
     end_time            timestamptz NOT NULL,
     last_modified       timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted             boolean NOT NULL DEFAULT FALSE,
     PRIMARY KEY (train_number, departure_date)
 );
 
@@ -110,3 +111,6 @@ FOR EACH ROW EXECUTE PROCEDURE set_bearing();
 SELECT create_hypertable('rata.trains', 'departure_date');
 SELECT create_hypertable('rata.timetablerows', 'departure_date');
 SELECT create_hypertable('rata.compositions', 'departure_date');
+SELECT set_chunk_time_interval('rata.trains', interval '1 year');
+SELECT set_chunk_time_interval('rata.timetablerows', interval '1 month');
+SELECT set_chunk_time_interval('rata.compositions', interval '3 months');

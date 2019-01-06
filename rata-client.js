@@ -2,6 +2,7 @@ const async = require("async");
 const fs = require("fs");
 const moment = require("moment");
 const mqtt = require("mqtt");
+const pollTrains = require("./pollTrains");
 const train = require ("./consumers/train");
 const trainlocation = require ("./consumers/trainlocation");
 const composition = require("./consumers/composition");
@@ -16,33 +17,32 @@ function main(callback) {
             callback();
         });
     } else {
-        // No parameter given - open MQTT connection
+        // No parameter given - start polling trains and open MQTT connection
+        pollTrains.startPolling();
         listenRataMQTT();
     }
 }
 
+/**
+ * Handles a file
+ */
 function handleFile(fileName, callback) {
     fs.readFile(fileName, function(err, data) {
         if (err) {
-            callback("Could not read file!");
+            callback("Could not read file", fileName);
         } else {
+            let json = null;
+
             try {
                 json = JSON.parse(data);
             } catch (e) {
-                callback("JSON parse failed!");
+                callback("JSON parse failed");
             }
 
             async.eachSeries(json, function(item, next) {
                 let fileType = "?";
-
-                if (item.timeTableRows) {
-                    fileType = "trains";
-                }
-    
-                if (item.journeySections) {
-                    fileType = "compositions";
-                }
-
+                if (item.timeTableRows) fileType = "trains";
+                if (item.journeySections) fileType = "compositions";
                 processMessage(fileType, item, function(err) {
                     if (err) console.log(moment().toISOString(), err);
                     next();
@@ -54,6 +54,27 @@ function handleFile(fileName, callback) {
     });
 }
 
+/**
+ * Receives train data
+ */
+pollTrains.on("data", function(data) {
+    async.eachSeries(data, function(item, next) {
+        processMessage("trains", item, function(err) {
+            if (err) console.log(moment().toISOString(), err);
+            next();
+        });
+    }, function() {
+        return;
+    });
+});
+
+pollTrains.on("error", function(err) {
+    console.log(moment().toISOString(), "error", err)
+});
+
+/**
+ * Listens for data over MQTT
+ */
 function listenRataMQTT() {
     const client = mqtt.connect("mqtt://rata-mqtt.digitraffic.fi");
 
@@ -63,8 +84,8 @@ function listenRataMQTT() {
         } else {
             console.log(moment().toISOString(), "MQTT: Connected.");
 
-            // Listen trains
-            client.subscribe(["trains/#", "compositions/#", "train-locations/#"], function(err) {
+            // Listen compositions and train-locations
+            client.subscribe(["compositions/#", "train-locations/#"], function(err) {
                 if (!err) {
                     console.log(moment().toISOString(), "MQTT: Subscribed.");
                     rataMQTTDisconnected = false;

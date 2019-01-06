@@ -5,7 +5,7 @@ const u = require ("../utils");
 // Reusable set of columns
 const cs_trains = new p.pgp.helpers.ColumnSet(["train_number", "departure_date", "operator_code", "train_type",
     "commuter_line_id", "running_currently", "cancelled", "version", "timetable_type", "acceptance_date",
-    "begin_station", "begin_time", "end_station", "end_time", "last_modified"], {table: {schema: "rata", table: "trains"}});
+    "begin_station", "begin_time", "end_station", "end_time", "last_modified", "deleted"], {table: {schema: "rata", table: "trains"}});
 
 const cs_timetable_rows = new p.pgp.helpers.ColumnSet(["train_number", "departure_date", "row_index", "train_stopping",
     "station", "commercial_stop", "commercial_track", "arr_cancelled", "arr_scheduled", "arr_estimate", "arr_unknown_delay",
@@ -144,7 +144,8 @@ function prepareTrain(data, callback) {
         begin_time: timeTableRows[0].dep_scheduled,
         end_station: timeTableRows[last].station,
         end_time: timeTableRows[last].arr_scheduled,
-        last_modified: moment().toISOString()
+        last_modified: moment().toISOString(),
+        deleted: u.filterBoolean(data.deleted)
     };
 
     callback(null, {train: train, timeTableRows: timeTableRows});
