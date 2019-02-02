@@ -12,15 +12,7 @@ let running = false;
 
 module.exports.startPolling = function() {
     if (!running) {
-        p.db.any("SELECT MAX(version) AS maxversion FROM rata.trains")
-        .then(data => {
-            maxVersion = Number(data[0].maxversion);
-            running = true;
-            return query();
-        })
-        .catch(error => {
-            return pollTrains.emit("error", "Could not query maxVersion");
-        })
+        maxVersion = 0;
     }
 }
 
@@ -41,7 +33,7 @@ function query() {
         nextQuery = null;
     }
 
-    const uri = "https://rata.digitraffic.fi/api/v1/trains?version=" + maxVersion;
+    const uri = "https://rata.digitraffic.fi/api/v1/all-trains?version=" + maxVersion;
 
     u.requestWithEncoding(uri, function (err, result) {
         if (err) {

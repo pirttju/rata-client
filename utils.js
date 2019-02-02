@@ -5,11 +5,19 @@ var exports = module.exports = {};
 /**
  * Filters INT value */
 exports.filterInt = function(val) {
-    if (/^(\-|\+)?([0-9]+)$/.test(val)) {
-        return Number(val);
+    let foo = 0;
+
+    try {
+        foo = Number(val);    
+    } catch (e) {
+        foo = null;
     }
-    
-    return null;
+
+    if (isNaN(foo)) {
+        foo = null;
+    }
+
+    return foo;
 }
 
 /**
