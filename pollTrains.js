@@ -69,16 +69,16 @@ function query() {
         const length = Object.keys(data).length;
 
         if (length > 0) {
-            async.eachSeries(data, function(item, next) {
-                if (item.version && Number(item.version) > maxVersion) maxVersion = Number(item.version); // track the version!
-                next();
-            }, function() {
-                // send data out for processing
-                pollTrains.emit("maxversion", maxVersion);
-                pollTrains.emit("data", data);
-                // call next query 20 seconds later
-                nextQuery = setTimeout(query, 20000);
-            })
+            // track the version!
+            for (let i = 0; i < length; i++) {
+                if (data[i].version && Number(data[i].version) > maxVersion) {
+                    maxVersion = Number (data[i].version);
+                }
+            }
+            pollTrains.emit("maxversion", maxVersion);
+            pollTrains.emit("data", data);
+            // call next query 20 seconds later
+            nextQuery = setTimeout(query, 20000);
         } else {
             // empty result (nothing to process)
             // call next query 20 seconds later
