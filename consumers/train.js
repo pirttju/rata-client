@@ -17,11 +17,12 @@ exports.processMessage = function(json, callback) {
     prepareTrain(json, function(err, data) {
         if (err) return callback(err);
 
-        // Delete old train (if any) if the timetable is less than one minute old
+        // Delete old train if it was accepted less than three minutes ago
+        // because it may have different timetablerows in the database
         const dNow = new Date().getTime();
         const dTrain = new Date(data.train.acceptance_date).getTime();
 
-        if ((dNow - dTrain) < 60000) {
+        if ((dNow - dTrain) < 180000) {
             data.deleteOld = true;
         } else {
             data.deleteOld = false;
