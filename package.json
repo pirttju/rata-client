@@ -1,0 +1,19 @@
+{
+  "name": "rata-client",
+  "version": "1.0.0",
+  "description": "rata.digitraffic.fi client",
+  "main": "rata-client.js",
+  "dependencies": {
+    "async": "^2.6.2",
+    "mqtt": "^2.18.8",
+    "moment": "^2.24.0",
+    "pg-promise": "^8.6.4",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Juhani Pirttilahti",
+  "license": "ISC"
+}
