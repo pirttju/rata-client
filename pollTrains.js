@@ -12,14 +12,14 @@ let running = false;
 
 module.exports.startPolling = function() {
     if (!running) {
-        p.db.any("SELECT MAX(version) AS maxversion FROM rata.trains")
+        p.db.any("SELECT MAX(version) AS maxversion FROM trains")
         .then(data => {
             maxVersion = Number(data[0].maxversion);
             running = true;
             return query();
         })
         .catch(error => {
-            return pollTrains.emit("error", "Could not query maxVersion");
+            return pollTrains.emit("error", "Could not query maxversion");
         })
     }
 }
