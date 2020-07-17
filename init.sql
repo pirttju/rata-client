@@ -18,15 +18,12 @@ CREATE TABLE trains (
     PRIMARY KEY (departure_date, train_number)
 );
 
-CREATE INDEX ON trains (operator_code);
-CREATE INDEX ON trains (train_type);
-
 CREATE TABLE timetablerows (
     departure_date      date NOT NULL,
     train_number        int NOT NULL,
     row_index           smallint NOT NULL,
-    train_stopping      boolean NOT NULL DEFAULT FALSE,
     station             text NOT NULL,
+    train_stopping      boolean NOT NULL DEFAULT FALSE,
     commercial_stop     boolean NOT NULL DEFAULT FALSE,
     commercial_track    text,
     arr_cancelled       boolean,
