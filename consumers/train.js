@@ -2,15 +2,50 @@ const p = require("../pgconn");
 const u = require ("../utils");
 
 // Reusable set of columns
-const cs_trains = new p.pgp.helpers.ColumnSet(["departure_date", "train_number", "train_type", "commuter_line_id", "operator_code", 
-    "running_currently", "cancelled", "version", "adhoc_timetable", "acceptance_date", "begin_station", "begin_time", "end_station",
-    "end_time", "last_modified", "deleted"], {table: {schema: "public", table: "trains"}});
+const cs_trains = new p.pgp.helpers.ColumnSet([
+    "departure_date",
+    "train_number",
+    "train_type",
+    "commuter_line_id",
+    "operator_code",
+    "running_currently",
+    "cancelled",
+    "version",
+    "adhoc_timetable",
+    "acceptance_date",
+    "begin_station",
+    "begin_time",
+    "end_station",
+    "end_time",
+    {name: "last_modified", mod: "^", def: "CURRENT_TIMESTAMP"}
+], {table: {table: "trains", schema: "public"}});
 
-const cs_timetablerows = new p.pgp.helpers.ColumnSet(["departure_date", "train_number", "row_index", "station", "train_stopping",
-    "commercial_stop", "commercial_track", "arr_cancelled", "arr_scheduled", "arr_estimate", "arr_unknown_delay",
-    "arr_actual", "arr_minutes", "arr_cause_code", "dep_cancelled", "dep_scheduled", "dep_estimate", "dep_unknown_delay",
-    "dep_actual", "dep_minutes", "dep_cause_code", "train_ready", "train_ready_src", "train_passed"], 
-    {table: {schema: "public", table: "timetablerows"}});
+const cs_timetablerows = new p.pgp.helpers.ColumnSet([
+    "departure_date",
+    "train_number",
+    "row_index",
+    "station",
+    "train_stopping",
+    "commercial_stop",
+    "commercial_track",
+    "arr_cancelled",
+    "arr_scheduled",
+    "arr_estimate",
+    "arr_unknown_delay",
+    "arr_actual",
+    "arr_minutes",
+    "arr_cause_code",
+    "dep_cancelled",
+    "dep_scheduled",
+    "dep_estimate",
+    "dep_unknown_delay",
+    "dep_actual",
+    "dep_minutes",
+    "dep_cause_code",
+    "train_ready",
+    "train_ready_src",
+    "train_passed"
+], {table: {table: "timetablerows", schema: "public"}});
 
 exports.processMessage = function(json, callback) {
     prepareTrain(json, function(err, data) {
@@ -129,8 +164,7 @@ function prepareTrain(data, callback) {
         begin_station: timetablerows[0].station,
         begin_time: timetablerows[0].dep_scheduled,
         end_station: timetablerows[last].station,
-        end_time: timetablerows[last].arr_scheduled,
-        last_modified: "DEFAULT"
+        end_time: timetablerows[last].arr_scheduled
     };
 
     callback(null, {train: train, timetablerows: timetablerows});
