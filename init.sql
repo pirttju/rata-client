@@ -21,8 +21,6 @@ CREATE TABLE trains (
 CREATE INDEX ON trains (operator_code);
 CREATE INDEX ON trains (train_type);
 
-CREATE TYPE train_ready_type AS ENUM ('KUPLA', 'LIIKE', 'PHONE', 'UNKNOWN');
-
 CREATE TABLE timetablerows (
     departure_date      date NOT NULL,
     train_number        int NOT NULL,
@@ -46,7 +44,7 @@ CREATE TABLE timetablerows (
     dep_minutes         smallint,
     dep_cause_code      text,
     train_ready         timestamptz,
-    train_ready_src     train_ready_type,
+    train_ready_src     text,
     train_passed        boolean,
     actual_platform     text,
     PRIMARY KEY (departure_date, train_number, row_index)
@@ -55,7 +53,7 @@ CREATE TABLE timetablerows (
 CREATE INDEX ON timetablerows (station);
 
 -- create timescaledb tables
-SELECT create_hypertable('rata.trains', 'departure_date');
-SELECT create_hypertable('rata.timetablerows', 'departure_date');
-SELECT set_chunk_time_interval('rata.trains', interval '1 year');
-SELECT set_chunk_time_interval('rata.timetablerows', interval '3 months');
+SELECT create_hypertable('trains', 'departure_date');
+SELECT create_hypertable('timetablerows', 'departure_date');
+SELECT set_chunk_time_interval('trains', interval '1 year');
+SELECT set_chunk_time_interval('timetablerows', interval '3 months');
