@@ -45,8 +45,7 @@ CREATE TABLE timetablerows (
     dep_cause_code      text,
     train_ready         timestamptz,
     train_ready_src     text,
-    train_passed        boolean,
-    actual_platform     text,
+    train_passed        boolean
     PRIMARY KEY (departure_date, train_number, row_index)
 );
 
