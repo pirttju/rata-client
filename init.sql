@@ -1,9 +1,9 @@
 CREATE TABLE trains (
     departure_date      date NOT NULL,
     train_number        int NOT NULL,
-    operator_code       text,
     train_type          text NOT NULL,
     commuter_line_id    text,
+    operator_code       text,
     running_currently   boolean NOT NULL DEFAULT FALSE,
     cancelled           boolean NOT NULL DEFAULT FALSE,
     version             bigint NOT NULL,
