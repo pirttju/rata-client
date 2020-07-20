@@ -12,7 +12,7 @@ let running = false;
 
 module.exports.startPolling = function() {
     if (!running) {
-        p.db.any("SELECT MAX(version) AS maxversion FROM trains")
+        p.db.one("SELECT MAX(version) AS maxversion FROM trains")
         .then(data => {
             maxVersion = Number(data[0].maxversion);
             running = true;
