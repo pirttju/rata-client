@@ -4,6 +4,7 @@
   "description": "rata.digitraffic.fi client",
   "main": "rata-client.js",
   "dependencies": {
+    "async": "^3.2.0",
     "pg-promise": "^10.5.8",
     "request": "^2.88.0"
   },
