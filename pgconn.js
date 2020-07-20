@@ -1,8 +1,8 @@
-var options = {};
-var pgp = require("pg-promise")(options);
-var cn = "postgres://"; // Postgres connection string
-var db = pgp(cn);
+const dbConfig = require("../db-config.json");
+const pgp = require("pg-promise");
 
-module.exports = {
-    pgp, db
-};
+const initOptions = {};
+const pgp = pgPromise(initOptions);
+const db = pgp(dbConfig);
+
+module.exports = { pgp, db };
