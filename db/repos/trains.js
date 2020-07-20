@@ -19,6 +19,7 @@ function createColumnsets(pgp) {
       "end_time",
       {name: "last_modified", mod: "^", def: "CURRENT_TIMESTAMP"}
     ], {table: {table: "trains", schema: "public"}});
+  }
 }
 
 class TrainsRepository {
