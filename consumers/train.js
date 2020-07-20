@@ -1,198 +1,131 @@
-const p = require("../pgconn");
-const u = require ("../utils");
+async function flatten(departureDate, trainNumber, i, version, arr, dep) {
+  const c = {...arr, ...dep}; // common values
 
-// Reusable set of columns
-const cs_trains = new p.pgp.helpers.ColumnSet([
-    "departure_date",
-    "train_number",
-    "train_type",
-    "commuter_line_id",
-    "operator_code",
-    "running_currently",
-    "cancelled",
-    "version",
-    "adhoc_timetable",
-    "acceptance_date",
-    "begin_station",
-    "begin_time",
-    "end_station",
-    "end_time",
-    {name: "last_modified", mod: "^", def: "CURRENT_TIMESTAMP"}
-], {table: {table: "trains", schema: "public"}});
+  const row = {
+    departure_date: departureDate,
+    train_number: trainNumber,
+    row_index: i,
+    version: version,
+    station: c.stationShortCode,
+    train_stopping: c.trainStopping,
+    commercial_stop: c.commercialStop !== undefined ? c.commercialStop : false,
+    commercial_track: c.commercialTrack ? c.commercialTrack : null,
+    arr_scheduled: null,
+    arr_actual: null,
+    arr_diff: null,
+    arr_is_estimate: null,
+    arr_unknown_delay: null,
+    arr_cancelled: null,
+    arr_cause: null,
+    dep_scheduled: null,
+    dep_actual: null,
+    dep_diff: null,
+    dep_is_estimate: null,
+    dep_unknown_delay: null,
+    dep_cancelled: null,
+    dep_cause: null,
+    train_ready: null,
+    train_ready_src: null
+  };
 
-const cs_timetablerows = new p.pgp.helpers.ColumnSet([
-    "departure_date",
-    "train_number",
-    "row_index",
-    "station",
-    "train_stopping",
-    "commercial_stop",
-    "commercial_track",
-    "arr_cancelled",
-    "arr_scheduled",
-    "arr_estimate",
-    "arr_unknown_delay",
-    "arr_actual",
-    "arr_minutes",
-    "arr_cause_code",
-    "dep_cancelled",
-    "dep_scheduled",
-    "dep_estimate",
-    "dep_unknown_delay",
-    "dep_actual",
-    "dep_minutes",
-    "dep_cause_code",
-    "train_ready",
-    "train_ready_src",
-    "train_passed"
-], {table: {table: "timetablerows", schema: "public"}});
+  if (arr !== null) {
+    row.arr_scheduled = arr.scheduledTime;
+    row.arr_actual = arr.actualTime !== undefined ? arr.actualTime : (arr.liveEstimateTime ? arr.liveEstimateTime : null);
+    row.arr_diff = arr.differenceInMinutes;
+    row.arr_is_estimate = arr.actualTime !== undefined ? false : (arr.liveEstimateTime ? true : false);
+    row.arr_unknown_delay = arr.unknownDelay !== undefined ? arr.unknownDelay : false;
+    row.arr_cancelled = arr.cancelled;
 
-exports.processMessage = function(json, callback) {
-    prepareTrain(json, function(err, data) {
-        if (err)
-            return callback(err);
-
-        upsert(data, function (err, results) {
-            if (err)
-                return callback(err);
-            callback();
-        });
-    });
-}
-
-function prepareTrain(data, callback) {
-    const timetablerows = [];
-    const length = data.timeTableRows.length;
-    let row_index = 0;
-    let j = 0;
-
-    // flatten arrival and departure rows into one row
-    for (let i = 0; i <= length; i = i + 2) {
-        // Coalesce cause codes into one column
-        let arrCauseCode = null;
-        let depCauseCode = null;
-        if (i > 0 && Array.isArray(data.timeTableRows[i-1].causes)) {
-            if (data.timeTableRows[i-1].causes.length > 0) {
-                if (data.timeTableRows[i-1].causes[0].thirdCategoryCode) {
-                    arrCauseCode = data.timeTableRows[i-1].causes[0].thirdCategoryCode;
-                } else if (data.timeTableRows[i-1].causes[0].detailedCategoryCode) {
-                    arrCauseCode = data.timeTableRows[i-1].causes[0].detailedCategoryCode;
-                } else if (data.timeTableRows[i-1].causes[0].categoryCode) {
-                    arrCauseCode = data.timeTableRows[i-1].causes[0].categoryCode;
-                }
-            }
-        }
-        if (i < length && Array.isArray(data.timeTableRows[i].causes)) {
-            if (data.timeTableRows[i].causes.length > 0) {
-                if (data.timeTableRows[i].causes[0].thirdCategoryCode) {
-                    depCauseCode = data.timeTableRows[i].causes[0].thirdCategoryCode;
-                } else if (data.timeTableRows[i].causes[0].detailedCategoryCode) {
-                    depCauseCode = data.timeTableRows[i].causes[0].detailedCategoryCode;
-                } else if (data.timeTableRows[i].causes[0].categoryCode) {
-                    depCauseCode = data.timeTableRows[i].causes[0].categoryCode;
-                }
-            }
-        }
-
-        // "Train ready" bit
-        let trainReady = null;
-        let trainReadySrc = null;
-        if (i < length && data.timeTableRows[i].trainReady) {
-            if (data.timeTableRows[i].trainReady.accepted) {
-                try {
-                    trainReady = data.timeTableRows[i].trainReady.timestamp;
-                    trainReadySrc = data.timeTableRows[i].trainReady.source;
-                } catch (e) {
-                    trainReady = null;
-                    trainReadySrc = null;
-                }
-            }
-        }
-
-        let trainPassed = null;
-        if (i > 0 && i < length) {
-            trainPassed = data.timeTableRows[i-1].actualTime === data.timeTableRows[i].actualTime;
-        }
-
-        if (i > 0) j = i - 1;
-
-        const row = {
-            departure_date: data.departureDate,
-            train_number: data.trainNumber,
-            row_index: row_index,
-            train_stopping: data.timeTableRows[j].trainStopping,
-            station: data.timeTableRows[j].stationShortCode,
-            commercial_stop: u.filterBoolean(data.timeTableRows[j].commercialStop),
-            commercial_track: u.filterValue(data.timeTableRows[j].commercialTrack),
-            arr_cancelled: i > 0 ? u.filterBoolean(data.timeTableRows[i-1].cancelled) : null,
-            arr_scheduled: i > 0 ? u.filterValue(data.timeTableRows[i-1].scheduledTime) : null,
-            arr_estimate: i > 0 ? u.filterValue(data.timeTableRows[i-1].liveEstimateTime) : null,
-            arr_unknown_delay: i > 0 ? u.filterBoolean(data.timeTableRows[i-1].unknownDelay) : null,
-            arr_actual: i > 0 ? u.filterValue(data.timeTableRows[i-1].actualTime) : null,
-            arr_minutes: i > 0 ? u.filterInt(data.timeTableRows[i-1].differenceInMinutes) : null,
-            arr_cause_code: arrCauseCode,
-            dep_cancelled: i < length ? u.filterBoolean(data.timeTableRows[i].cancelled) : null,
-            dep_scheduled: i < length ? u.filterValue(data.timeTableRows[i].scheduledTime) : null,
-            dep_estimate: i < length ? u.filterValue(data.timeTableRows[i].liveEstimateTime) : null,
-            dep_unknown_delay: i < length ? u.filterBoolean(data.timeTableRows[i].unknownDelay) : null,
-            dep_actual: i < length ? u.filterValue(data.timeTableRows[i].actualTime) : null,
-            dep_minutes: i < length ? u.filterInt(data.timeTableRows[i].differenceInMinutes) : null,
-            dep_cause_code: depCauseCode,
-            train_ready: trainReady,
-            train_ready_src: trainReadySrc,
-            train_passed: trainPassed
-        };
-
-        timetablerows.push(row);
-
-        row_index++;
+    if (arr.causes.length > 0) {
+      if (arr.causes[0].thirdCategoryCode) {
+        row.arr_cause = arr.causes[0].thirdCategoryCode;
+      } else if (arr.causes[0].detailedCategoryCode) {
+        row.arr_cause = arr.causes[0].detailedCategoryCode;
+      } else if (arr.causes[0].categoryCode) {
+        row.arr_cause = arr.causes[0].categoryCode;
+      }
     }
+  }
 
-    const last = timetablerows.length - 1;
+  if (dep !== null) {
+    row.dep_scheduled = dep.scheduledTime;
+    row.dep_actual = dep.actualTime !== undefined ? dep.actualTime : (dep.liveEstimateTime ? dep.liveEstimateTime : null);
+    row.dep_diff = dep.differenceInMinutes;
+    row.dep_is_estimate = dep.actualTime !== undefined ? false : (dep.liveEstimateTime ? true : false);
+    row.dep_unknown_delay = dep.unknownDelay !== undefined ? dep.unknownDelay : false;
+    row.dep_cancelled = dep.cancelled;
 
-    const train = {
-        departure_date: data.departureDate,
-        train_number: data.trainNumber,
-        train_type: data.trainType,
-        commuter_line_id: u.filterValue(data.commuterLineID),
-        operator_code: data.operatorShortCode,
-        running_currently: data.runningCurrently,
-        cancelled: data.cancelled,
-        version: data.version,
-        adhoc_timetable: (data.timetableType === "ADHOC") ? true : false,
-        acceptance_date: data.timetableAcceptanceDate,
-        begin_station: timetablerows[0].station,
-        begin_time: timetablerows[0].dep_scheduled,
-        end_station: timetablerows[last].station,
-        end_time: timetablerows[last].arr_scheduled
-    };
+    if (dep.causes.length > 0) {
+      if (dep.causes[0].thirdCategoryCode) {
+        row.dep_cause = dep.causes[0].thirdCategoryCode;
+      } else if (dep.causes[0].detailedCategoryCode) {
+        row.dep_cause = dep.causes[0].detailedCategoryCode;
+      } else if (dep.causes[0].categoryCode) {
+        row.dep_cause = dep.causes[0].categoryCode;
+      }
+    }
+  }
 
-    callback(null, {train: train, timetablerows: timetablerows});
+  if (c.trainReady) {
+    row.train_ready = c.trainReady.timestamp;
+    row.train_ready_src = c.trainReady.source;
+  }
+
+  return row;
 }
 
-function upsert(data, callback) {
-    p.db.task(t => {
-        const queries = [];
-        if (data.train.deleted) {
-            queries.push(t.none("DELETE FROM trains WHERE departure_date = $1 AND train_number = $2", [data.train.departure_date, data.train.train_number]));
-            queries.push(t.none("DELETE FROM timetablerows WHERE departure_date = $1 AND train_number = $2", [data.train.departure_date, data.train.train_number]));
-        } else {
-            const q1 = t.none(p.pgp.helpers.insert(data.train, cs_trains) +
-                " ON CONFLICT(departure_date, train_number) DO UPDATE SET " +
-                cs_trains.assignColumns({from: 'EXCLUDED', skip: ["departure_date", "train_number"]}));
-            queries.push(q1);
+async function processTrain(t) {
+  const train = {
+    departure_date: t.departureDate,
+    train_number: t.trainNumber,
+    version: t.version,
+    train_type: t.trainType,
+    commuter_line_id: t.commuterLineID ? t.commuterLineID : null,
+    operator_code: t.operatorShortCode,
+    running_currently: t.runningCurrently,
+    cancelled: t.cancelled,
+    adhoc_timetable: t.timetableType !== "REGULAR" ? true : false,
+    acceptance_date: t.timetableAcceptanceDate,
+    begin_station: t.timeTableRows[0].stationShortCode,
+    begin_time: t.timeTableRows[0].scheduledTime,
+    end_station: null,
+    end_time: null,
+    timetable: []
+  };
 
-            const q2 = t.none(p.pgp.helpers.insert(data.timetablerows, cs_timetablerows) +
-                " ON CONFLICT(departure_date, train_number, row_index) DO UPDATE SET " +
-                cs_timetablerows.assignColumns({from: 'EXCLUDED', skip: ["departure_date", "train_number", "row_index"]}));
-            queries.push(q2);
-        }
-        return t.batch(queries);
-    })
-    .then(() => {
-        return callback(null);
-    })
-    .catch(error => {
-        return callback(error);
-    });
+  // process timetable rows
+  let arrival = null;
+  let i = 0;
+  for (const row of t.timeTableRows) {
+    if (row.type === "ARRIVAL") {
+      arrival = row;
+    } else if (row.type === "DEPARTURE") {
+      train.timetable.push(await flatten(t.departureDate, t.trainNumber, i, t.version, arrival, row));
+      i++;
+    }
+  }
+
+  // last arrival (destination)
+  train.timetable.push(await flatten(t.departureDate, t.trainNumber, i, t.version, arrival, null));
+
+  train.end_station = arrival.stationShortCode;
+  train.end_time = arrival.scheduledTime;
+
+  return train;
 }
+
+async function processResult(trains) {
+  const data = {
+    version: 0,
+    trains: []
+  };
+  for (const train of trains) {
+    if (train.version > data.version)
+      data.version = train.version;
+    data.trains.push(await processTrain(train));
+  }
+
+  return data;
+}
+
+module.exports = { processResult };
