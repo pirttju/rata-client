@@ -122,7 +122,7 @@ function prepareTrain(data, callback) {
             row_index: row_index,
             train_stopping: data.timeTableRows[j].trainStopping,
             station: data.timeTableRows[j].stationShortCode,
-            commercial_stop: data.timeTableRows[j].commercialStop,
+            commercial_stop: u.filterBoolean(data.timeTableRows[j].commercialStop),
             commercial_track: u.filterValue(data.timeTableRows[j].commercialTrack),
             arr_cancelled: i > 0 ? u.filterBoolean(data.timeTableRows[i-1].cancelled) : null,
             arr_scheduled: i > 0 ? u.filterValue(data.timeTableRows[i-1].scheduledTime) : null,
