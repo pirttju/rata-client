@@ -13,7 +13,7 @@ CREATE TABLE trains (
     begin_time          timestamptz NOT NULL,
     end_station         text NOT NULL,
     end_time            timestamptz NOT NULL,
-    last_modified       timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
+    last_modified       timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (departure_date, train_number)
 );
 
