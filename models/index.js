@@ -14,12 +14,10 @@ function upsertTrains(data) {
 function upsertCompositions(data) {
   return db.tx("upsert-compositions", t => {
     const queries = [];
-    if (data.trains && data.trains.length > 0)
-      queries.push(t.trains.upsert(data.trains));
-    if (data.timetablerows && data.timetablerows.length > 0)
-      queries.push(t.timetablerows.upsert(data.timetablerows));
+    if (data.compositions && data.compositions.length > 0)
+      queries.push(t.compositions.upsert(data.compositions));
     return t.batch(queries);
   });
 }
 
-module.exports = {upsertTrains};
+module.exports = {upsertTrains, upsertCompositions};
