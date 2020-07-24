@@ -22,3 +22,5 @@ function query(version = null) {
     console.log(err);
   })
 }
+
+query();
