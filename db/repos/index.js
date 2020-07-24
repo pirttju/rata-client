@@ -1,4 +1,5 @@
 module.exports = {
-  Trains: require("./trains"),
-  Timetablerows: require("./timetablerows")
+  Compositions: require("./compositions"),
+  Timetablerows: require("./timetablerows"),
+  Trains: require("./trains")
 };
