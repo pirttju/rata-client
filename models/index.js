@@ -10,9 +10,9 @@ function upsertTrains(data) {
 
     if (data.trains && data.trains.length > 0) {
       queries.push(t.trains.upsert(data.trains));
-      //for (const train of data.trains) {
-      //  queries.push(t.timetablerows.deleteOldVersions(train.departure_date, train.train_number, train.version));
-      //}
+      for (const train of data.trains) {
+        queries.push(t.timetablerows.deleteOldVersions(train.departure_date, train.train_number, train.version));
+      }
     }
 
     return t.batch(queries);
