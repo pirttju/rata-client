@@ -10,8 +10,7 @@ function upsertTrains(data) {
       for (const train of data.trains) {
         queries.push(t.timetablerows.deleteOldVersions(train.departure_date, train.train_number, train.version));
       }
-    return t.batch(queries)
-    });
+    return t.batch(queries);
   });
 }
 
