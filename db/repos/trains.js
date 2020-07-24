@@ -17,7 +17,7 @@ function createColumnsets(pgp) {
       "begin_time",
       "end_station",
       "end_time",
-      {name: "last_modified", mod: "^", def: "CURRENT_TIMESTAMP"}
+      {name: "last_modified", mod: "^", def: "current_timestamp"}
     ], {table: {table: "trains", schema: "public"}});
   }
 }
@@ -34,15 +34,19 @@ class TrainsRepository {
     return this.db.none(query);
   }
 
+  async maxversion() {
+    return this.db.one("select max(version) from trains");
+  }
+
   async upsert(data) {
     const query = this.pgp.helpers.insert(data, cs.insert) +
-      " ON CONFLICT(departure_date, train_number) DO UPDATE SET " +
-      cs.insert.assignColumns({from: 'EXCLUDED', skip: ["departure_date", "train_number"]});
+      " on conflict (departure_date, train_number) do update set " +
+      cs.insert.assignColumns({from: 'excluded', skip: ["departure_date", "train_number"]});
     return this.db.none(query);
   }
 
   async delete(date, number) {
-    return this.db.result("DELETE FROM trains WHERE departure_date = $1 AND train_number = $2", [date, +number], r => r.rowCount);
+    return this.db.result("delete from trains where departure_date = $1 AND train_number = $2", [date, +number], r => r.rowCount);
   }
 }
 
