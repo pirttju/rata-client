@@ -16,7 +16,7 @@ function createColumnsets(pgp) {
       "total_length",
       "maximum_speed",
       {name: "last_modified", mod: "^", def: "current_timestamp"}
-    ], {table: {table: "trains", schema: "public"}});
+    ], {table: {table: "compositions", schema: "public"}});
   }
 }
 
