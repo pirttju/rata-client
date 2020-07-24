@@ -47,8 +47,27 @@ CREATE TABLE timetablerows (
 
 CREATE INDEX ON timetablerows (station);
 
+CREATE TABLE compositions (
+    departure_date      date NOT NULL,
+    train_number        integer NOT NULL,
+    journey_section     smallint NOT NULL,
+    version             bigint NOT NULL,
+    begin_station       text NOT NULL,
+    begin_time          timestamptz NOT NULL,
+    end_station         text NOT NULL,
+    end_time            timestamptz NOT NULL,
+    locomotives         jsonb,
+    wagons              jsonb,
+    total_length        smallint,
+    maximum_speed       smallint,
+    last_modified       timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (departure_date, train_number, journey_section)
+);
+
 -- create timescaledb tables
 SELECT create_hypertable('trains', 'departure_date');
 SELECT create_hypertable('timetablerows', 'departure_date');
+SELECT create_hypertable('compositions', 'departure_date');
 SELECT set_chunk_time_interval('trains', interval '1 year');
 SELECT set_chunk_time_interval('timetablerows', interval '3 months');
+SELECT set_chunk_time_interval('compositions', interval '1 year');
