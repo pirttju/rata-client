@@ -45,13 +45,17 @@ class TimetablerowsRepository {
 
   async upsert(data) {
     const query = this.pgp.helpers.insert(data, cs.insert) +
-      " ON CONFLICT(departure_date, train_number, row_index) DO UPDATE SET " +
-      cs.insert.assignColumns({from: 'EXCLUDED', skip: ["departure_date", "train_number", "row_index"]});
+      " on conflict (departure_date, train_number, row_index) do update set " +
+      cs.insert.assignColumns({from: 'excluded', skip: ["departure_date", "train_number", "row_index"]});
     return this.db.none(query);
   }
 
   async delete(date, number) {
-    return this.db.result("DELETE FROM timetablerows WHERE departure_date = $1 AND train_number = $2", [date, +number], r => r.rowCount);
+    return this.db.result("delete from timetablerows where departure_date = $1 AND train_number = $2", [date, +number], r => r.rowCount);
+  }
+
+  async deleteold(date, number, version) {
+    return this.db.result("delete from timetablerows where departure_date = $1 and train_number = $2 AND version < $3", [date, +number, +version], r => r.rowCount);
   }
 }
 
