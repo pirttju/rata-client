@@ -89,9 +89,10 @@ async function processTrain(t) {
     begin_station: t.timeTableRows[0].stationShortCode,
     begin_time: t.timeTableRows[0].scheduledTime,
     end_station: null,
-    end_time: null,
-    timetable: []
+    end_time: null
   };
+  
+  const timetablerows = [];
 
   // process timetable rows
   let arrival = null;
@@ -111,18 +112,21 @@ async function processTrain(t) {
   train.end_station = arrival.stationShortCode;
   train.end_time = arrival.scheduledTime;
 
-  return train;
+  return {train, timetablerows};
 }
 
 async function processResult(trains) {
   const data = {
     version: 0,
-    trains: []
+    trains: [],
+    timetablerows: []
   };
   for (const train of trains) {
     if (train.version > data.version)
       data.version = train.version;
-    data.trains.push(await processTrain(train));
+    const processed = await processTrain(train);
+    data.trains.push(processed.train);
+    data.timetablerows.push(processed.timetablerows);
   }
 
   return data;
