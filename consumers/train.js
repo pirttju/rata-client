@@ -101,13 +101,13 @@ async function processTrain(t) {
     if (row.type === "ARRIVAL") {
       arrival = row;
     } else if (row.type === "DEPARTURE") {
-      train.timetable.push(await flatten(t.departureDate, t.trainNumber, i, t.version, arrival, row));
+      timetablerows.push(await flatten(t.departureDate, t.trainNumber, i, t.version, arrival, row));
       i++;
     }
   }
 
   // last arrival (destination)
-  train.timetable.push(await flatten(t.departureDate, t.trainNumber, i, t.version, arrival, null));
+  timetablerows.push(await flatten(t.departureDate, t.trainNumber, i, t.version, arrival, null));
 
   train.end_station = arrival.stationShortCode;
   train.end_time = arrival.scheduledTime;
