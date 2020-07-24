@@ -11,8 +11,8 @@ function createColumnsets(pgp) {
       "begin_time",
       "end_station",
       "end_time",
-      "locomotives",
-      "wagons",
+      {name: "locomotives", mod: ":json"},
+      {name: "wagons", mod: ":json"},
       "total_length",
       "maximum_speed",
       {name: "last_modified", mod: "^", def: "current_timestamp"}
