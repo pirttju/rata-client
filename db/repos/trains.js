@@ -46,7 +46,7 @@ class TrainsRepository {
   }
 
   async delete(date, number) {
-    return this.db.result("delete from trains where departure_date = $1 AND train_number = $2", [date, +number], r => r.rowCount);
+    return this.db.result("delete from trains where departure_date = $1 and train_number = $2", [date, +number], r => r.rowCount);
   }
 }
 
