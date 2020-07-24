@@ -45,7 +45,7 @@ class TimetablerowsRepository {
 
   async upsert(data) {
     const query = this.pgp.helpers.insert(data, cs.insert) +
-      " ON CONFLICT(departure_date, train_number) DO UPDATE SET " +
+      " ON CONFLICT(departure_date, train_number, row_index) DO UPDATE SET " +
       cs.insert.assignColumns({from: 'EXCLUDED', skip: ["departure_date", "train_number", "row_index"]});
     return this.db.none(query);
   }
