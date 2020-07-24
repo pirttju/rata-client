@@ -126,7 +126,7 @@ async function processResult(trains) {
       data.version = train.version;
     const processed = await processTrain(train);
     data.trains.push(processed.train);
-    data.timetablerows.push(processed.timetablerows);
+    data.timetablerows.push(...processed.timetablerows);
   }
 
   return data;
