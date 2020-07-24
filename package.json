@@ -5,8 +5,9 @@
   "main": "rata-client.js",
   "dependencies": {
     "async": "^3.2.0",
-    "pg-promise": "^10.5.8",
-    "needle": "^2.5.0"
+    "bluebird": "^3.7.2",
+    "needle": "^2.5.0",
+    "pg-promise": "^10.5.8"
   },
   "devDependencies": {},
   "scripts": {
