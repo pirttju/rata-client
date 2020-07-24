@@ -6,7 +6,7 @@ function upsertTrains(data) {
       t.trains.upsert(data.trains),
       t.timetablerows.upsert(data.timetablerows)
     ]);
-  }
+  });
 }
 
 module.exports = {upsertTrains};
