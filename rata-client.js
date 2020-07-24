@@ -1,6 +1,7 @@
 const needle = require("needle");
 const {db} = require("./db");
 const train = require("./consumers/train.js");
+const models = require("./models");
 
 function query(version = null) {
   const apiurl = "https://rata.digitraffic.fi/api/v1/trains";
@@ -13,7 +14,7 @@ function query(version = null) {
   })
   .then(data => {
     // processed data
-    console.log(data);
+    models.upsertTrains(data);
     setTimeout(() => query(data.version), 15000);
     return;
   })
