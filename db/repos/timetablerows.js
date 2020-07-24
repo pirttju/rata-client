@@ -51,15 +51,15 @@ class TimetablerowsRepository {
   }
 
   async delete(date, number) {
-    return this.db.any("delete from timetablerows where departure_date = $1 and train_number = $2", [date, +number]);
+    return this.db.result("delete from timetablerows where departure_date = $1 and train_number = $2", [date, +number], r => r.rowCount);
   }
 
   async deleteOldVersions(date, number, version) {
-    return this.db.any("delete from timetablerows where departure_date = $1 and train_number = $2 and version < $3", [date, +number, +version]);
+    return this.db.result("delete from timetablerows where departure_date = $1 and train_number = $2 and version < $3", [date, +number, +version], r => r.rowCount);
   }
 
   async deleteByDate(date) {
-    return this.db.any("delete from timetablerows where departure_date = $1", [date]);
+    return this.db.result("delete from timetablerows where departure_date = $1", [date], r => r.rowCount);
   }
 }
 
