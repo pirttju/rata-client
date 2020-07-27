@@ -66,7 +66,7 @@ async function processResult(trains, version) {
   return data;
 }
 
-function compositionQuery(version = null) {
+function query(version = null) {
   const apiurl = "https://rata.digitraffic.fi/api/v1/compositions";
   const params = version !== null ? "?version=" + version.toString() : "";
   const options = { compressed: true, json: true };
