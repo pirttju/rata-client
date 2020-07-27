@@ -79,13 +79,13 @@ function query(version = null) {
   .then(data => {
     return Promise.all([models.upsertCompositions(data), data.version]);
   })
-  .then(([data, version]) => {
+  .then(([data, nextVersion]) => {
     if (isRunning) {
       if (timer) {
         clearTimeout(timer)
         timer = 0;
       }
-      timer = setTimeout(() => query(version), 60000);
+      timer = setTimeout(() => query(nextVersion), 60000);
     }
   })
   .catch(err => {
