@@ -32,7 +32,7 @@ class CompositionsRepository {
     return this.db.none(query);
   }
 
-  async maxversion() {
+  async getMaxVersion() {
     return this.db.one("select max(version) from compositions");
   }
 
