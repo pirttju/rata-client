@@ -80,7 +80,7 @@ function query(version = null) {
   })
   .then(([data, version]) => {
     console.log("compositions version", version);
-    timer = setTimeout(() => query(version), 30000);
+    timer = setTimeout(() => query(version), 60000);
   })
   .catch(err => {
     console.log(err);
