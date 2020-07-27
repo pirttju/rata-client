@@ -49,14 +49,14 @@ async function start() {
   if (trainsVersion.max) {
     trainQuery(trainsVersion.max);
   } else {
-    console.error("Could not get max version from trains table.");
+    trainQuery();
   }
 
   const compositionsVersion = await db.compositions.getMaxVersion();
   if (compositionsVersion.max) {
     compositionQuery(compositionsVersion.max);
   } else {
-    console.error("Could not get max version from compositions table.");
+    compositionQuery();
   }
 }
 
