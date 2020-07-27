@@ -17,6 +17,7 @@ function trainQuery(version = null) {
     return Promise.all([models.upsertTrains(data), data.version]);
   })
   .then(([data, version]) => {
+    console.log("trains version", version);
     setTimeout(() => trainQuery(version), 30000);
   })
   .catch(err => {
@@ -37,6 +38,7 @@ function compositionQuery(version = null) {
     return Promise.all([models.upsertCompositions(data), data.version]);
   })
   .then(([data, version]) => {
+    console.log("compositions version", version);
     setTimeout(() => compositionQuery(version), 30000);
   })
   .catch(err => {
