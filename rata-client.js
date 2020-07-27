@@ -4,7 +4,7 @@ const train = require("./consumers/train.js");
 const models = require("./models");
 
 function query(version = null) {
-  const apiurl = "https://rata.digitraffic.fi/api/v1/trains";
+  const apiurl = "https://rata.digitraffic.foo/api/v1/trains";
   const params = version !== null ? "?version=" + version.toString() : "";
   const options = { compressed: true, json: true };
 
