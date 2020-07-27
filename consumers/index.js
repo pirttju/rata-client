@@ -1,4 +1,4 @@
 module.exports = {
-  Compositions: require("./compositions"),
-  Trains: require("./trains")
+  Composition: require("./composition"),
+  Train: require("./train")
 };
