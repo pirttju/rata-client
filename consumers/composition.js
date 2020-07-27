@@ -1,3 +1,9 @@
+const {db} = require("../db");
+const models = require("../models");
+const needle = require("needle");
+
+let timer = 0;
+
 async function parse(departureDate, trainNumber, i, version, c) {
   if (c.beginTimeTableRow === undefined || c.endTimeTableRow === undefined) {
     return null;
@@ -60,4 +66,41 @@ async function processResult(trains, version) {
   return data;
 }
 
-module.exports = { processResult };
+function compositionQuery(version = null) {
+  const apiurl = "https://rata.digitraffic.fi/api/v1/compositions";
+  const params = version !== null ? "?version=" + version.toString() : "";
+  const options = { compressed: true, json: true };
+
+  needle("get", apiurl + params, options)
+  .then(response => {
+    return processResult(response.body, version);
+  })
+  .then(data => {
+    return Promise.all([models.upsertCompositions(data), data.version]);
+  })
+  .then(([data, version]) => {
+    console.log("compositions version", version);
+    timer = setTimeout(() => query(version), 30000);
+  })
+  .catch(err => {
+    console.log(err);
+  })
+}
+
+async function start() {
+  const version = await db.compositions.getMaxVersion();
+  if (version.max) {
+    query(version.max);
+  } else {
+    query();
+  }
+}
+
+function stop() {
+  if (timer) {
+    clearTimeout(timer);
+    timer = 0;
+  }
+}
+
+module.exports = { start, stop };
