@@ -1,6 +1,5 @@
-const needle = require("needle");
-const {db} = require("./db");
-const train = require("./train.js");
-const composition = require("./composition.js");
-const models = require("./models");
+const train = require("./consumers/train.js");
+const composition = require("./consumers/composition.js");
 
+train.start();
+composition.start();
