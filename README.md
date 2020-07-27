@@ -1,11 +1,10 @@
 # rata-client
-Client program for rata.digitraffic.fi.
-Stores trains into PostgreSQL database.
+Client program for rata.digitraffic.fi. Stores trains and compositions into a local PostgreSQL database.
 
 ## Requirements
 
-Postgresql v10+
-Timescaledb extension
+- PostgreSQL v10+
+- TimescaleDB extension
 
 ## Install
 
