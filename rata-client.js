@@ -26,8 +26,8 @@ function query(version = null) {
   })
 }
 
-function start() {
-  const version = db.trains.getMaxVersion();
+function async start() {
+  const version = await db.trains.getMaxVersion();
   query(version);
 }
 
