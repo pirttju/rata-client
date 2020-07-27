@@ -3,6 +3,7 @@ const models = require("../models");
 const needle = require("needle");
 
 let timer = 0;
+let isRunning = false;
 
 async function parse(departureDate, trainNumber, i, version, c) {
   if (c.beginTimeTableRow === undefined || c.endTimeTableRow === undefined) {
@@ -79,17 +80,29 @@ function query(version = null) {
     return Promise.all([models.upsertCompositions(data), data.version]);
   })
   .then(([data, version]) => {
-    console.log("compositions version", version);
-    timer = setTimeout(() => query(version), 60000);
+    if (isRunning) {
+      if (timer) {
+        clearTimeout(timer)
+        timer = 0;
+      }
+      timer = setTimeout(() => query(version), 60000);
+    }
   })
   .catch(err => {
-    console.log("query version", version);
     console.log(err);
+    if (isRunning) {
+      if (timer) {
+        clearTimeout(timer)
+        timer = 0;
+      }
+      timer = setTimeout(() => query(version), 300000); // try again after five minutes
+    }
   })
 }
 
 async function start() {
   const version = await db.compositions.getMaxVersion();
+  isRunning = true;
   if (version.max) {
     query(version.max);
   } else {
@@ -98,6 +111,7 @@ async function start() {
 }
 
 function stop() {
+  isRunning = false;
   if (timer) {
     clearTimeout(timer);
     timer = 0;
