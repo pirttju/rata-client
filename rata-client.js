@@ -16,10 +16,7 @@ function query(version = null) {
     return Promise.all([models.upsertTrains(data), data.version]);
   })
   .then(([data, version]) => {
-    console.log("data", data);
-    console.log("version", version);
-    //setTimeout(() => query(data.version), 15000);
-    return;
+    setTimeout(() => query(version), 30000);
   })
   .catch(err => {
     // err
