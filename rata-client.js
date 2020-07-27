@@ -14,7 +14,9 @@ function query(version = null) {
   })
   .then(data => {
     // processed data
-    models.upsertTrains(data);
+    return models.upsertTrains(data)
+  })
+  .then(data => {
     setTimeout(() => query(data.version), 15000);
     return;
   })
