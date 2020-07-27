@@ -13,11 +13,11 @@ function query(version = null) {
     return train.processResult(response.body);
   })
   .then(data => {
-    // processed data
-    return models.upsertTrains(data)
+    return Promise.all([models.upsertTrains(data), data.version]);
   })
-  .then(data => {
+  .then(([data, version]) => {
     console.log("data", data);
+    console.log("version", version);
     //setTimeout(() => query(data.version), 15000);
     return;
   })
