@@ -83,6 +83,7 @@ function query(version = null) {
     timer = setTimeout(() => query(version), 60000);
   })
   .catch(err => {
+    console.log("query version", version);
     console.log(err);
   })
 }
