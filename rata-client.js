@@ -27,7 +27,7 @@ function query(version = null) {
 }
 
 function start() {
-  const version = train.getMaxVersion();
+  const version = models.getMaxVersion();
   query(version);
 }
 
