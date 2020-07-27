@@ -115,9 +115,9 @@ async function processTrain(t) {
   return {train, timetablerows};
 }
 
-async function processResult(trains) {
+async function processResult(trains, version) {
   const data = {
-    version: null,
+    version: version,
     trains: [],
     timetablerows: []
   };
