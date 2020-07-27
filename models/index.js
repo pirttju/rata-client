@@ -34,4 +34,8 @@ function upsertCompositions(data) {
   });
 }
 
-module.exports = {upsertTrains, upsertCompositions};
+function getMaxVersion() {
+  return t.trains.getMaxVersion();
+}
+
+module.exports = {upsertTrains, upsertCompositions, getMaxVersion};
