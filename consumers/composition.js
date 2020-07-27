@@ -43,9 +43,9 @@ async function processCompositions(t) {
   return {train, journeySections};
 }
 
-async function processResult(trains) {
+async function processResult(trains, version) {
   const data = {
-    version: null,
+    version: version,
     trains: [],
     journeySections: []
   };
