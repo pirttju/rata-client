@@ -11,7 +11,7 @@ function trainQuery(version = null) {
 
   needle("get", apiurl + params, options)
   .then(response => {
-    return train.processResult(response.body);
+    return train.processResult(response.body, version);
   })
   .then(data => {
     return Promise.all([models.upsertTrains(data), data.version]);
@@ -32,7 +32,7 @@ function compositionQuery(version = null) {
 
   needle("get", apiurl + params, options)
   .then(response => {
-    return composition.processResult(response.body);
+    return composition.processResult(response.body, version);
   })
   .then(data => {
     return Promise.all([models.upsertCompositions(data), data.version]);
