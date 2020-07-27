@@ -3,6 +3,7 @@ const models = require("../models");
 const needle = require("needle");
 
 let timer = 0;
+let isRunning = false;
 
 async function flatten(departureDate, trainNumber, i, version, arr, dep) {
   const c = {...arr, ...dep}; // common values
@@ -151,16 +152,29 @@ function query(version = null) {
     return Promise.all([models.upsertTrains(data), data.version]);
   })
   .then(([data, version]) => {
-    console.log("trains version", version);
-    timer = setTimeout(() => query(version), 30000);
+    if (isRunning) {
+      if (timer) {
+        clearTimeout(timer)
+        timer = 0;
+      }
+      timer = setTimeout(() => query(version), 30000);
+    }
   })
   .catch(err => {
     console.log(err);
+    if (isRunning) {
+      if (timer) {
+        clearTimeout(timer)
+        timer = 0;
+      }
+      timer = setTimeout(() => query(version), 300000); // try again after five minutes
+    }
   })
 }
 
 async function start() {
   const version = await db.trains.getMaxVersion();
+  isRunning = true;
   if (version.max) {
     query(version.max);
   } else {
@@ -169,6 +183,7 @@ async function start() {
 }
 
 function stop() {
+  isRunning = false;
   if (timer) {
     clearTimeout(timer);
     timer = 0;
