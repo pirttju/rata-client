@@ -151,13 +151,13 @@ function query(version = null) {
   .then(data => {
     return Promise.all([models.upsertTrains(data), data.version]);
   })
-  .then(([data, version]) => {
+  .then(([data, nextVersion]) => {
     if (isRunning) {
       if (timer) {
         clearTimeout(timer)
         timer = 0;
       }
-      timer = setTimeout(() => query(version), 30000);
+      timer = setTimeout(() => query(nextVersion), 30000);
     }
   })
   .catch(err => {
