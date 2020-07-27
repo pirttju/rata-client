@@ -45,12 +45,12 @@ async function processCompositions(t) {
 
 async function processResult(trains) {
   const data = {
-    version: 0,
+    version: null,
     trains: [],
     journeySections: []
   };
   for (const train of trains) {
-    if (train.version > data.version)
+    if (train.version > data.version || data.version == null)
       data.version = train.version;
     const processed = await processCompositions(train);
     data.trains.push(processed.train);
