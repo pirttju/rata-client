@@ -1,3 +1,4 @@
+-- train data
 CREATE TABLE trains (
     departure_date      date NOT NULL,
     train_number        int NOT NULL,
@@ -17,6 +18,11 @@ CREATE TABLE trains (
     PRIMARY KEY (departure_date, train_number)
 );
 
+SELECT create_hypertable('trains', 'departure_date');
+SELECT set_chunk_time_interval('trains', interval '1 year');
+
+
+-- timetable data for trains
 CREATE TABLE timetablerows (
     departure_date      date NOT NULL,
     train_number        int NOT NULL,
@@ -47,6 +53,11 @@ CREATE TABLE timetablerows (
 
 CREATE INDEX ON timetablerows (station);
 
+SELECT create_hypertable('timetablerows', 'departure_date');
+SELECT set_chunk_time_interval('timetablerows', interval '2 months');
+
+
+-- composition data for trains
 CREATE TABLE compositions (
     departure_date      date NOT NULL,
     train_number        integer NOT NULL,
@@ -64,10 +75,5 @@ CREATE TABLE compositions (
     PRIMARY KEY (departure_date, train_number, journey_section)
 );
 
--- create timescaledb tables
-SELECT create_hypertable('trains', 'departure_date');
-SELECT create_hypertable('timetablerows', 'departure_date');
 SELECT create_hypertable('compositions', 'departure_date');
-SELECT set_chunk_time_interval('trains', interval '1 year');
-SELECT set_chunk_time_interval('timetablerows', interval '3 months');
 SELECT set_chunk_time_interval('compositions', interval '1 year');
