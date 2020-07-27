@@ -37,7 +37,7 @@ function upsertCompositions(data) {
 function getMaxVersion() {
   return db.task("get-max-version", t => {
     return t.trains.getMaxVersion();
-  }
+  });
 }
 
 module.exports = {upsertTrains, upsertCompositions, getMaxVersion};
