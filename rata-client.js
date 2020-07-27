@@ -17,7 +17,8 @@ function query(version = null) {
     return models.upsertTrains(data)
   })
   .then(data => {
-    setTimeout(() => query(data.version), 15000);
+    console.log("data", data);
+    //setTimeout(() => query(data.version), 15000);
     return;
   })
   .catch(err => {
