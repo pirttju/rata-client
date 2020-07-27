@@ -4,6 +4,8 @@ const train = require("./consumers/train.js");
 const models = require("./models");
 
 function query(version = null) {
+  console.log("version", version);
+  return;
   const apiurl = "https://rata.digitraffic.fi/api/v1/trains";
   const params = version !== null ? "?version=" + version.toString() : "";
   const options = { compressed: true, json: true };
@@ -24,4 +26,9 @@ function query(version = null) {
   })
 }
 
-query();
+function start() {
+  const version = train.getMaxVersion();
+  query(version);
+}
+
+start();
