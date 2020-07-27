@@ -37,7 +37,7 @@ function compositionQuery(version = null) {
     return Promise.all([models.upsertCompositions(data), data.version]);
   })
   .then(([data, version]) => {
-    setTimeout(() => query(version), 30000);
+    setTimeout(() => compositionQuery(version), 30000);
   })
   .catch(err => {
     console.log(err);
