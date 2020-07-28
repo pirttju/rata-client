@@ -4,7 +4,7 @@ Client program for rata.digitraffic.fi. Stores trains and compositions into a lo
 ## Requirements
 
 - PostgreSQL v10+
-- TimescaleDB extension
+- TimescaleDB extension (used for automatic table partitioning)
 
 ## Install
 
