@@ -10,7 +10,7 @@ Client program for rata.digitraffic.fi. Stores trains and compositions into a lo
 
 Create a database and then create initial tables by running init.sql.
 
-psql <db> -f init.sql
+psql -d database -f init.sql
 
 Create db-config.json:
 
