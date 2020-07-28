@@ -24,12 +24,18 @@ Create db-config.json:
 
 ## Usage
 
-node rata-client.js
+node rata-client.js -poll
 
-polls /trains endpoint continuously
+polls trains and compositions from digitraffic
 
 or
 
-node rata-client.js fileName
+node rata-client.js -c file
 
-imports trains JSON dump from fileName
+imports archived compositions from json file
+
+or
+
+node rata-client.js -t file
+
+imports archived trains from json file
