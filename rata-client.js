@@ -51,7 +51,7 @@ if (argv.c && fileExists(argv.c)) {
 } else {
   console.error("Usage: rata-client.js [options]");
   console.error("  options:");
-  console.error("    -c file  import compositions from json");
-  console.error("    -t file  import trains from json");
+  console.error("    -c file  import compositions from a file");
+  console.error("    -t file  import trains from a file");
   console.error("    -poll    start polling");
 }
