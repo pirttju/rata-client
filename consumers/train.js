@@ -173,8 +173,8 @@ function query(version = null) {
 }
 
 async function importFromJSON(data) {
-  const res = processResult(data, 0);
-  return models.upsertTrains(res);
+  const res = await processResult(data, 0);
+  return Promise.all([models.upsertTrains(res), res.version]);
 }
 
 async function start() {
