@@ -44,4 +44,4 @@ imports archived trains from json file
 
 Process all trains json files in a directory
 
-for f in *.json; do echo $f; node ../rata-client/rata-client.js -t $f; done
+for f in *trains.json; do echo $f; node ../rata-client/rata-client.js -t $f; done
