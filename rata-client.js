@@ -55,7 +55,7 @@ function main(argv) {
     fileImport(argv.c, composition);
   } else if (argv.t && fileExists(argv.t)) {
     fileImport(argv.t, train);
-  } else if (argv.poll) {
+  } else if (argv.p) {
     console.log("Start polling...");
     poll();
   } else {
@@ -63,9 +63,8 @@ function main(argv) {
     console.error("  options:");
     console.error("    -c file  import compositions from a file");
     console.error("    -t file  import trains from a file");
-    console.error("    -poll    start polling");
+    console.error("    -p       start polling");
   }
 }
 
-console.log(argv);
 main(argv);
