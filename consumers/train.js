@@ -180,9 +180,13 @@ function query(version = null) {
   })
 }
 
-async function importFromJSON(data) {
+async function importFromJSON(data, upsert = false) {
   const res = await processResult(data, 0);
-  return Promise.all([models.upsertTrains(res), res.version]);
+  if (upsert) {
+    return Promise.all([models.upsertTrains(res), res.version]);
+  } else {
+    return Promise.all([models.insertTrains(res), res.version]);
+  }
 }
 
 async function start() {
