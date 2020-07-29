@@ -69,4 +69,4 @@ function upsertTrains(data) {
   });
 }
 
-module.exports = {insertTrains, upsertCompositions, upsertTrains};
+module.exports = {insertCompositions, insertTrains, upsertCompositions, upsertTrains};
