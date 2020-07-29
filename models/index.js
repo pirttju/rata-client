@@ -14,6 +14,13 @@ function upsertTrains(data) {
         queries.push(t.timetablerows.deleteOldVersions(train.departure_date, train.train_number, train.version));
       }
     }
+    
+    if (data.deleted && data.deleted.length > 0) {
+      for (const train of data.deleted) {
+        queries.push(t.trains.delete(train.departure_date, train.train_number));
+        queries.push(t.timetablerows.delete(train.departure_date, train.train_number));
+      }
+    }
 
     return t.batch(queries);
   });
