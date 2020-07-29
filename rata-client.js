@@ -22,7 +22,7 @@ function fileExists(path) {
 }
 
 // parses json from a file and runs import
-async function fileImport(path, consumer) {
+function fileImport(path, consumer) {
   const fileContents = fs.readFileSync(path, 'utf8');
   let data;
 
@@ -34,20 +34,25 @@ async function fileImport(path, consumer) {
   }
 
   if (data && data.length > 0) {
-    const result = await consumer.processResult(data);
-    console.log(result);
+    consumer.importFromJSON(data)
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.error(err);
+    });
   } else {
     console.error("No data");
     return false;
   }
 }
 
-async function main(argv) {
+function main(argv) {
   // checks for command line arguments
   if (argv.c && fileExists(argv.c)) {
-    await fileImport(argv.c, composition);
+    fileImport(argv.c, composition);
   } else if (argv.t && fileExists(argv.t)) {
-    await fileImport(argv.t, train);
+    fileImport(argv.t, train);
   } else if (argv.poll) {
     poll();
   } else {
