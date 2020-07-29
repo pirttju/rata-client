@@ -22,7 +22,7 @@ function fileExists(path) {
 }
 
 // parses json from a file and runs import
-function fileImport(path, consumer) {
+async function fileImport(path, consumer) {
   const fileContents = fs.readFileSync(path, 'utf8');
   let data;
 
@@ -34,7 +34,8 @@ function fileImport(path, consumer) {
   }
 
   if (data && data.length > 0) {
-    consumer.processResult(data);
+    const result = await consumer.processResult(data);
+    console.log(result);
   } else {
     console.error("No data");
     return false;
