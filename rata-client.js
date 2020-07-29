@@ -10,7 +10,7 @@ function poll() {
 }
 
 // checks if file exists
-function fileExists(file) {
+function fileExists(path) {
   try {
     if (fs.existsSync(path)) {
       return true;
@@ -22,8 +22,8 @@ function fileExists(file) {
 }
 
 // parses json from a file and runs import
-async function fileImport(file, consumer) {
-  const fileContents = fs.readFileSync(file, 'utf8');
+async function fileImport(path, consumer) {
+  const fileContents = fs.readFileSync(path, 'utf8');
 
   try {
     const data = JSON.parse(fileContents);
