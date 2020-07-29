@@ -22,7 +22,7 @@ function fileExists(file) {
 }
 
 // parses json from a file and runs import
-async function import(file, consumer) {
+async function fileImport(file, consumer) {
   const fileContents = fs.readFileSync(file, 'utf8');
 
   try {
@@ -43,9 +43,9 @@ async function import(file, consumer) {
 
 // checks for command line arguments
 if (argv.c && fileExists(argv.c)) {
-  import(argv.c, composition);
+  fileImport(argv.c, composition);
 } else if (argv.t && fileExists(argv.t)) {
-  import(argv.t, train);
+  fileImport(argv.t, train);
 } else if (argv.poll) {
   poll();
 } else {
