@@ -35,8 +35,8 @@ function fileImport(path, consumer) {
 
   if (data && data.length > 0) {
     consumer.importFromJSON(data)
-    .then(res => {
-      console.log(res);
+    .then(([res, version]) => {
+      console.log(res, version);
     })
     .catch(err => {
       console.error(err);
