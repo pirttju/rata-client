@@ -126,14 +126,22 @@ async function processResult(trains, version) {
   const data = {
     version: version,
     trains: [],
-    timetablerows: []
+    timetablerows: [],
+    deleted: []
   };
   for (const train of trains) {
     if (train.version > data.version || data.version == null)
       data.version = train.version;
-    const processed = await processTrain(train);
-    data.trains.push(processed.train);
-    data.timetablerows.push(...processed.timetablerows);
+    if (train.deleted) {
+      data.deleted.push({
+        departure_date: train.departure_date,
+        train_number: train.train_number
+      });
+    } else {
+      const processed = await processTrain(train);
+      data.trains.push(processed.train);
+      data.timetablerows.push(...processed.timetablerows);
+    }
   }
 
   return data;
