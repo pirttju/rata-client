@@ -42,17 +42,21 @@ async function fileImport(path, consumer) {
   }
 }
 
-// checks for command line arguments
-if (argv.c && fileExists(argv.c)) {
-  fileImport(argv.c, composition);
-} else if (argv.t && fileExists(argv.t)) {
-  fileImport(argv.t, train);
-} else if (argv.poll) {
-  poll();
-} else {
-  console.error("Usage: rata-client.js [options]");
-  console.error("  options:");
-  console.error("    -c file  import compositions from a file");
-  console.error("    -t file  import trains from a file");
-  console.error("    -poll    start polling");
+async function main(argv) {
+  // checks for command line arguments
+  if (argv.c && fileExists(argv.c)) {
+    await fileImport(argv.c, composition);
+  } else if (argv.t && fileExists(argv.t)) {
+    await fileImport(argv.t, train);
+  } else if (argv.poll) {
+    poll();
+  } else {
+    console.error("Usage: rata-client.js [options]");
+    console.error("  options:");
+    console.error("    -c file  import compositions from a file");
+    console.error("    -t file  import trains from a file");
+    console.error("    -poll    start polling");
+  }
 }
+
+main(argv);
