@@ -100,6 +100,11 @@ function query(version = null) {
   })
 }
 
+async function importFromJSON(data) {
+  const res = processResult(data, 0);
+  return models.upsertCompositions(res);
+}
+
 async function start() {
   const version = await db.compositions.getMaxVersion();
   isRunning = true;
@@ -118,4 +123,4 @@ function stop() {
   }
 }
 
-module.exports = { processResult, start, stop };
+module.exports = { importFromJSON, start, stop };
