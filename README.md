@@ -42,6 +42,16 @@ imports archived trains from json file
 
 ## Batch import example
 
-Process all trains json files in a directory
+Create a temp directory
+
+mkdir temp_trains
+
+cd temp_trains
+
+Create a list of urls to download from https://rata.digitraffic.fi/api/v1/trains/dumps/list.html and then download all files
+
+xargs -n 1 curl --compressed -O < url_list.txt
+
+Process all trains json files in the directory
 
 for f in *trains.json; do echo $f; node ../rata-client/rata-client.js -t $f; done
