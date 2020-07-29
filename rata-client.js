@@ -24,9 +24,10 @@ function fileExists(path) {
 // parses json from a file and runs import
 function fileImport(path, consumer) {
   const fileContents = fs.readFileSync(path, 'utf8');
+  let data;
 
   try {
-    const data = JSON.parse(fileContents);
+    data = JSON.parse(fileContents);
   } catch(err) {
     console.error(err);
     return false;
