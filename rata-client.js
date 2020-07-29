@@ -56,6 +56,7 @@ function main(argv) {
   } else if (argv.t && fileExists(argv.t)) {
     fileImport(argv.t, train);
   } else if (argv.poll) {
+    console.log("Start polling...");
     poll();
   } else {
     console.error("Usage: rata-client.js [options]");
