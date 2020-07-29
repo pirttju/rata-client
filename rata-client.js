@@ -36,10 +36,12 @@ function fileImport(path, consumer) {
   if (data && data.length > 0) {
     consumer.importFromJSON(data)
     .then(([res, version]) => {
-      console.log(res, version);
+      console.log(res.length, "trains upserted, "(", version, ")");
+      process.exit(0);
     })
     .catch(err => {
       console.error(err);
+      process.exit(1);
     });
   } else {
     console.error("No data");
