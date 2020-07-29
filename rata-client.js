@@ -22,7 +22,7 @@ function fileExists(path) {
 }
 
 // parses json from a file and runs import
-function fileImport(path, consumer) {
+function fileImport(path, consumer, upsert = false) {
   const fileContents = fs.readFileSync(path, 'utf8');
   let data;
 
@@ -34,10 +34,10 @@ function fileImport(path, consumer) {
   }
 
   if (data && data.length > 0) {
-    consumer.importFromJSON(data)
+    consumer.importFromJSON(data, upsert)
     .then(([res, version]) => {
-      console.log(res.length + " trains upserted (" + version + ")");
-      process.exit(0);
+      console.log("File imported (version " + version + ")");
+      process.exit();
     })
     .catch(err => {
       console.error(err);
@@ -49,12 +49,15 @@ function fileImport(path, consumer) {
   }
 }
 
+// checks for command line arguments
 function main(argv) {
-  // checks for command line arguments
+  let upsert = false;
+  if (argv.u)
+    upsert = true;
   if (argv.c && fileExists(argv.c)) {
-    fileImport(argv.c, composition);
+    fileImport(argv.c, composition, upsert);
   } else if (argv.t && fileExists(argv.t)) {
-    fileImport(argv.t, train);
+    fileImport(argv.t, train, upsert);
   } else if (argv.p) {
     console.log("Start polling...");
     poll();
@@ -63,6 +66,7 @@ function main(argv) {
     console.error("  options:");
     console.error("    -c file  import compositions from a file");
     console.error("    -t file  import trains from a file");
+    console.error("    -u       upsert instead of insert when importing");
     console.error("    -p       start polling");
   }
 }
