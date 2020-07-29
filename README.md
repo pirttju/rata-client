@@ -39,3 +39,9 @@ or
 node rata-client.js -t file
 
 imports archived trains from json file
+
+## Batch import example
+
+Process all trains json files in a directory
+
+for f in *.json; do echo $f; node ../rata-client/rata-client.js -t $f; done
