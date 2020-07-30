@@ -134,8 +134,8 @@ async function processResult(trains, version) {
       data.version = train.version;
     if (train.deleted) {
       data.deleted.push({
-        departure_date: train.departure_date,
-        train_number: train.train_number
+        departure_date: train.departureDate,
+        train_number: train.trainNumber
       });
     } else {
       const processed = await processTrain(train);
