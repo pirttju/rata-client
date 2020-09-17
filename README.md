@@ -13,7 +13,9 @@ Create a database and then create initial tables by running init.sql.
 psql -d database -f init.sql
 ```
 
-Create db-config.json:
+Open config.js and change config.DIGITRAFFIC_USER variable to your environment.
+
+Create db-config.json (to a parent directory):
 ```
 {
   "host": "localhost",
