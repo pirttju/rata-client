@@ -1,6 +1,7 @@
 const {db} = require("../db");
 const models = require("../models");
 const needle = require("needle");
+const config = require("../config");
 
 let timer = 0;
 let isRunning = false;
@@ -150,7 +151,7 @@ async function processResult(trains, version) {
 function query(version = null) {
   const apiurl = "https://rata.digitraffic.fi/api/v1/trains";
   const params = version !== null ? "?version=" + version.toString() : "";
-  const options = { compressed: true, json: true, user_agent: "RataClient/2.0" };
+  const options = { compressed: true, json: true, headers: { "Digitraffic-User": config.DIGITRAFFIC_USER, "User-Agent": config.USER_AGENT } };
 
   needle("get", apiurl + params, options)
   .then(response => {
