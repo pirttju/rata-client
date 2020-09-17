@@ -70,7 +70,7 @@ async function processResult(trains, version) {
 function query(version = null) {
   const apiurl = "https://rata.digitraffic.fi/api/v1/compositions";
   const params = version !== null ? "?version=" + version.toString() : "";
-  const options = { compressed: true, json: true };
+  const options = { compressed: true, json: true, user_agent: "RataClient/2.0" };
 
   needle("get", apiurl + params, options)
   .then(response => {
