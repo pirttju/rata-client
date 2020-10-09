@@ -28,9 +28,9 @@ Create db-config.json (to a parent directory):
 
 ## Usage
 ```
-node rata-client.js -poll
+node rata-client.js -p
 ```
-polls trains and compositions from digitraffic
+starts polling trains and compositions from digitraffic
 
 or
 ```
