@@ -15,14 +15,14 @@ psql -d database -f init.sql
 
 Open config.js and change config.DIGITRAFFIC_USER variable to your environment.
 
-Create db-config.json (to a parent directory):
+Update DB configuration (config.js):
 ```
 {
-  "host": "localhost",
-  "port": 5432,
-  "database": "db",
-  "user": "usr",
-  "password": "pass"
+  "host": "localhost", // host address
+  "port": 5432, // port
+  "database": "db", // database name
+  "user": "usr", // username
+  "password": "pass" // password
 }
 ```
 
