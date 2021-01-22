@@ -133,7 +133,7 @@ async function processResult(trains, version) {
   for (const train of trains) {
     if (train.version > data.version || data.version == null)
       data.version = train.version;
-    if (train.deleted) {
+    if (!config.ignoreDeleted && train.deleted) {
       data.deleted.push({
         departure_date: train.departureDate,
         train_number: train.trainNumber
