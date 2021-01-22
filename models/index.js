@@ -1,4 +1,5 @@
 const {db} = require("../db");
+const config = require("../config");
 
 function insertCompositions(data) {
   return db.tx("insert-compositions", t => {
@@ -58,7 +59,8 @@ function upsertTrains(data) {
       }
     }
 
-    if (data.deleted && data.deleted.length > 0) {
+    // delete train flagged as "deleted"
+    if (!config.ignoreDeleted && data.deleted && data.deleted.length > 0) {
       for (const del of data.deleted) {
         queries.push(t.trains.delete(del.departure_date, del.train_number));
         queries.push(t.timetablerows.delete(del.departure_date, del.train_number));
