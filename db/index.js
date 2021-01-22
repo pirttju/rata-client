@@ -1,7 +1,8 @@
 const promise = require("bluebird");
 const pgPromise = require("pg-promise");
 const monitor = require("pg-monitor");
-const dbConfig = require("../../db-config.json");
+const configuration = require("../config.js");
+const dbConfig = configuration.DB;
 const {Compositions, Timetablerows, Trains} = require("./repos");
 
 const initOptions = {
