@@ -9,4 +9,6 @@ config.DB = {
   "user": "usr",
   "password": "pass"
 }
+config.ignoreDeleted = false;
+
 module.exports = config;
