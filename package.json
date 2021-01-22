@@ -16,5 +16,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Juhani Pirttilahti",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pirttju/rata-client.git"
+  }
 }
