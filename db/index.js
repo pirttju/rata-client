@@ -1,9 +1,16 @@
 const promise = require("bluebird");
 const pgPromise = require("pg-promise");
 const monitor = require("pg-monitor");
-const configuration = require("../config.js");
-const dbConfig = configuration.DB;
+const dotenv = require("dotenv").config();
 const {Compositions, Timetablerows, Trains} = require("./repos");
+
+const config = {
+  host: process.env.POSTGRES_HOST,
+  port: process.env.POSTGRES_PORT,
+  database: process.env.POSTGRES_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+};
 
 const initOptions = {
   promiseLib: promise,
@@ -15,8 +22,11 @@ const initOptions = {
 };
 
 const pgp = pgPromise(initOptions);
-const db = pgp(dbConfig);
+const db = pgp(config);
 
+// Activate events monitor
+// -development: all events
+// -production: errors only
 if (process.env.NODE_ENV === "development") {
   monitor.attach(initOptions);
 } else {

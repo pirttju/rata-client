@@ -1,19 +1,20 @@
 {
   "name": "rata-client",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "description": "rata.digitraffic.fi client",
   "main": "rata-client.js",
   "dependencies": {
-    "async": "^3.2.0",
     "bluebird": "^3.7.2",
+    "dotenv": "^8.2.0",
     "minimist": "^1.2.5",
-    "needle": "^2.5.0",
+    "needle": "^2.6.0",
     "pg-monitor": "^1.4.1",
-    "pg-promise": "^10.5.8"
+    "pg-promise": "^10.9.5"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node rata-client.js -p"
   },
   "author": "Juhani Pirttilahti",
   "license": "MIT",

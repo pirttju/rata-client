@@ -1,29 +1,48 @@
 # rata-client
-Client program for rata.digitraffic.fi. Stores trains and compositions into a local PostgreSQL database.
+Client program for rata.digitraffic.fi API. Stores trains and compositions into a local PostgreSQL database.
 
 ## Requirements
 
+- NodeJS v14+
 - PostgreSQL v10+
+
+## Optional requirement
+
+- PM2
 - TimescaleDB extension (used for automatic table partitioning)
 
 ## Install
 
-Create a database and then create initial tables by running init.sql.
+Install node modules:
 ```
-psql -d database -f init.sql
+npm install
 ```
 
-Open config.js and change config.DIGITRAFFIC_USER variable to your environment.
+### Database setup
 
-Update DB configuration (config.js):
+Create a PostgreSQL database.
+
+Then create tables by running init.sql:
 ```
-{
-  "host": "localhost", // host address
-  "port": 5432, // port
-  "database": "db", // database name
-  "user": "usr", // username
-  "password": "pass" // password
-}
+psql -d mydb -f init.sql
+```
+
+If you want to use automatic partitioning for performance, you can use TimescaleDB extension. To configure partitioning run init_tsdb.sql:
+```
+psql -d mydb -f init_tsdb.sql
+```
+
+### Configuration
+
+Open config.js and revise config.DIGITRAFFIC_USER custom header to match your own application.
+
+Create .env file and put DB configuration there:
+```
+POSTGRES_HOST=127.0.0.1
+POSTGRES_PORT=5432
+POSTGRES_DB=mydb
+POSTGRES_USER=user
+POSTGRES_PASSWORD=pass
 ```
 
 ## Usage
@@ -44,12 +63,19 @@ node rata-client.js -t file
 ```
 imports archived trains from json file
 
+## Run in the background using PM2
+
+When you have installed PM2 run this in the main directory:
+```
+pm2 start
+```
+
 ## Batch import example
 
 Create a temp directory:
 ```
-mkdir temp_trains
-cd temp_trains
+mkdir temp
+cd temp
 ```
 Create a list of urls to download from https://rata.digitraffic.fi/api/v1/trains/dumps/list.html and then download all files:
 ```
