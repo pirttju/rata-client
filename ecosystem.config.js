@@ -3,8 +3,8 @@ module.exports = {
     name: "rata-client",
     script: "rata-client.js",
     args: "-p",
-    restart_delay: 1000,
-    watch: true,
+    restart_delay: 3000,
+    watch: false,
     env: {
       "NODE_ENV": "production"
     },
