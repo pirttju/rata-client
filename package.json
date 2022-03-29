@@ -6,7 +6,7 @@
   "dependencies": {
     "bluebird": "^3.7.2",
     "dotenv": "^8.2.0",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "needle": "^2.6.0",
     "pg-monitor": "^1.4.1",
     "pg-promise": "^10.9.5"
