@@ -5,20 +5,17 @@ function createColumnsets(pgp) {
     cs.insert = new pgp.helpers.ColumnSet([
       "departure_date",
       "train_number",
-      "version",
+      "operator_uic_code",
       "train_type",
       "commuter_line_id",
-      "operator_code",
       "running_currently",
       "cancelled",
-      "adhoc_timetable",
-      "acceptance_date",
-      "begin_station",
-      "begin_time",
-      "end_station",
-      "end_time",
+      "version",
+      "timetable_type",
+      "timetable_acceptance_date",
+      "deleted",
       {name: "last_modified", mod: "^", def: "current_timestamp"}
-    ], {table: {table: "trains", schema: "public"}});
+    ], {table: {table: "train", schema: "digitraffic"}});
   }
 }
 
@@ -35,7 +32,7 @@ class TrainsRepository {
   }
 
   async getMaxVersion() {
-    return this.db.one("select max(version) from trains");
+    return this.db.one("select max(version) from digitraffic.train");
   }
 
   async upsert(data) {
@@ -46,11 +43,11 @@ class TrainsRepository {
   }
 
   async delete(date, number) {
-    return this.db.result("delete from trains where departure_date = $1 and train_number = $2", [date, +number], r => r.rowCount);
+    return this.db.result("delete from digitraffic.train where departure_date = $1 and train_number = $2", [date, +number], r => r.rowCount);
   }
 
   async deleteByDate(date) {
-    return this.db.result("delete from trains where departure_date = $1", [date], r => r.rowCount);
+    return this.db.result("delete from digitraffic.train where departure_date = $1", [date], r => r.rowCount);
   }
 }
 
