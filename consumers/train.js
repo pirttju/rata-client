@@ -14,15 +14,15 @@ async function processTtr(departureDate, trainNumber, i, version, ttr) {
     version: version,
     station_short_code: ttr.stationShortCode,
     type: ttr.type,
-    train_stopping: ttr.trainStopping,
-    commercial_stop: ttr.commercialStop,
-    commercial_track: ttr.commercialTrack,
-    cancelled: ttr.cancelled,
+    train_stopping: ttr.trainStopping ? true : false,
+    commercial_stop: ttr.commercialStop ? true : false,
+    commercial_track: ttr.commercialTrack ? ttr.commercialTrack : null,
+    cancelled: ttr.cancelled ? true : false,
     scheduled_time: ttr.scheduledTime,
-    live_estimate_time: ttr.liveEstimateTime,
-    unknown_delay: ttr.unknownDelay,
-    actual_time: ttr.actualTime,
-    difference_in_minutes: ttr.differenceInMinutes,
+    live_estimate_time: ttr.liveEstimateTime ? ttr.liveEstimateTime : null,
+    unknown_delay: ttr.unknownDelay ? true : null,
+    actual_time: ttr.actualTime ? ttr.actualTime : null,
+    difference_in_minutes: ttr.differenceInMinutes ? ttr.differenceInMinutes : null,
     causes: null,
     train_ready: null
   };
@@ -37,8 +37,8 @@ async function processTtr(departureDate, trainNumber, i, version, ttr) {
     }
   }
 
-  if (ttr.trainReady) {
-    row.train_ready = ttr.trainReady.accepted;
+  if (ttr.trainReady && ttr.trainReady.accepted) {
+    row.train_ready = true;
   }
 
   return row;
