@@ -36,8 +36,7 @@ CREATE TABLE IF NOT EXISTS digitraffic.time_table_row (
     difference_in_minutes       smallint,
     causes                      text,
     train_ready                 boolean,
-    PRIMARY KEY (departure_date, train_number, row_number),
-    FOREIGN KEY (departure_date, train_number) REFERENCES digitraffic.train (departure_date, train_number) ON DELETE CASCADE
+    PRIMARY KEY (departure_date, train_number, row_number)
 );
 
 CREATE INDEX ON digitraffic.time_table_row (station_short_code);
@@ -56,6 +55,5 @@ CREATE TABLE IF NOT EXISTS digitraffic.composition (
     total_length                smallint NOT NULL,
     maximum_speed               smallint NOT NULL,
     last_modified               timestamp with time zone NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (departure_date, train_number, composition_number),
-    FOREIGN KEY (departure_date, train_number) REFERENCES digitraffic.train (departure_date, train_number) ON DELETE CASCADE
+    PRIMARY KEY (departure_date, train_number, composition_number)
 );
