@@ -38,6 +38,9 @@ CREATE TABLE IF NOT EXISTS digitraffic.time_table_row (
     FOREIGN KEY (departure_date, train_number) REFERENCES digitraffic.train (departure_date, train_number) ON DELETE CASCADE
 );
 
+CREATE INDEX ON digitraffic.time_table_row (station_short_code);
+CREATE INDEX ON digitraffic.time_table_row (scheduled_time);
+
 -- Compositions
 CREATE TABLE IF NOT EXISTS digitraffic.composition (
     departure_date              date NOT NULL,
