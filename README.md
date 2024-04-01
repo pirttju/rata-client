@@ -9,7 +9,6 @@ Client program for rata.digitraffic.fi API. Stores trains and compositions into 
 ## Optional requirement
 
 - PM2
-- TimescaleDB extension (used for automatic table partitioning)
 
 ## Install
 
@@ -25,11 +24,6 @@ Create a PostgreSQL database.
 Then create tables by running init.sql:
 ```
 psql -d mydb -f init.sql
-```
-
-If you want to use automatic partitioning for performance, you can use TimescaleDB extension. To configure partitioning run init_tsdb.sql:
-```
-psql -d mydb -f init_tsdb.sql
 ```
 
 ### Configuration
