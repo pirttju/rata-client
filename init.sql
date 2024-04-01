@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS digitraffic.time_table_row (
     departure_date              date NOT NULL,
     train_number                integer NOT NULL,
     row_number                  smallint NOT NULL,
+    version                     bigint NOT NULL,
     station_short_code          text NOT NULL,
     type                        text NOT NULL,
     train_stopping              boolean NOT NULL,
