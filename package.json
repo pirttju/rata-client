@@ -1,6 +1,6 @@
 {
   "name": "rata-client",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "rata.digitraffic.fi client",
   "main": "rata-client.js",
   "dependencies": {
