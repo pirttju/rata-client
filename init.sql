@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS digitraffic.train (
     timetable_type              text NOT NULL,
     timetable_acceptance_date   timestamp with time zone NOT NULL,
     deleted                     boolean,
+    last_modified               timestamp with time zone NOT NULL DEFAULT NOW(),
     PRIMARY KEY (departure_date, train_number)
 );
 
