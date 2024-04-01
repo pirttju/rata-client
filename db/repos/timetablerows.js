@@ -5,29 +5,22 @@ function createColumnsets(pgp) {
     cs.insert = new pgp.helpers.ColumnSet([
       "departure_date",
       "train_number",
-      "row_index",
+      "row_number",
       "version",
-      "station",
+      "station_short_code",
+      "type",
       "train_stopping",
       "commercial_stop",
       "commercial_track",
-      "arr_scheduled",
-      "arr_actual",
-      "arr_diff",
-      "arr_is_estimate",
-      "arr_unknown_delay",
-      "arr_cancelled",
-      "arr_cause",
-      "dep_scheduled",
-      "dep_actual",
-      "dep_diff",
-      "dep_is_estimate",
-      "dep_unknown_delay",
-      "dep_cancelled",
-      "dep_cause",
+      "cancelled",
+      "scheduled_time",
+      "live_estimate_time",
+      "unknown_delay",
+      "actual_time",
+      "difference_in_minutes",
+      "causes",
       "train_ready",
-      "train_ready_src"
-    ], {table: {table: "timetablerows", schema: "public"}});
+    ], {table: {table: "time_table_row", schema: "digitraffic"}});
   }
 }
 
@@ -45,21 +38,21 @@ class TimetablerowsRepository {
 
   async upsert(data) {
     const query = this.pgp.helpers.insert(data, cs.insert) +
-      " on conflict (departure_date, train_number, row_index) do update set " +
+      " on conflict (departure_date, train_number, row_number) do update set " +
       cs.insert.assignColumns({from: 'excluded', skip: ["departure_date", "train_number", "row_index"]});
     return this.db.none(query);
   }
 
   async delete(date, number) {
-    return this.db.result("delete from timetablerows where departure_date = $1 and train_number = $2", [date, +number], r => r.rowCount);
+    return this.db.result("delete from digitraffic.time_table_row where departure_date = $1 and train_number = $2", [date, +number], r => r.rowCount);
   }
 
   async deleteOldVersions(date, number, version) {
-    return this.db.result("delete from timetablerows where departure_date = $1 and train_number = $2 and version < $3", [date, +number, +version], r => r.rowCount);
+    return this.db.result("delete from digitraffic.time_table_row where departure_date = $1 and train_number = $2 and version < $3", [date, +number, +version], r => r.rowCount);
   }
 
   async deleteByDate(date) {
-    return this.db.result("delete from timetablerows where departure_date = $1", [date], r => r.rowCount);
+    return this.db.result("delete from digitraffic.time_table_row where departure_date = $1", [date], r => r.rowCount);
   }
 }
 
