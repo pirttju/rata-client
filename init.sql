@@ -48,12 +48,14 @@ CREATE TABLE IF NOT EXISTS digitraffic.composition (
     departure_date              date NOT NULL,
     train_number                integer NOT NULL,
     composition_number          smallint NOT NULL,
+    version                     bigint NOT NULL,
     begin_station_short_code    text NOT NULL,
     end_station_short_code      text NOT NULL,
     locomotives                 jsonb NOT NULL,
     wagons                      jsonb,
     total_length                smallint NOT NULL,
     maximum_speed               smallint NOT NULL,
+    last_modified               timestamp with time zone NOT NULL DEFAULT NOW(),
     PRIMARY KEY (departure_date, train_number, composition_number),
     FOREIGN KEY (departure_date, train_number) REFERENCES digitraffic.train (departure_date, train_number) ON DELETE CASCADE
 );
