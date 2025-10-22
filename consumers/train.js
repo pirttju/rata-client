@@ -1,4 +1,4 @@
-const {db} = require("../db");
+const { db } = require("../db");
 const models = require("../models");
 const needle = require("needle");
 const config = require("../config");
@@ -22,9 +22,12 @@ async function processTtr(departureDate, trainNumber, i, version, ttr) {
     live_estimate_time: ttr.liveEstimateTime ? ttr.liveEstimateTime : null,
     unknown_delay: ttr.unknownDelay ? true : null,
     actual_time: ttr.actualTime ? ttr.actualTime : null,
-    difference_in_minutes: ttr.differenceInMinutes ? ttr.differenceInMinutes : null,
+    difference_in_minutes: ttr.differenceInMinutes
+      ? ttr.differenceInMinutes
+      : null,
     causes: null,
-    train_ready: null
+    train_ready: null,
+    stop_sector: ttr.stopSector,
   };
 
   if (ttr.causes.length > 0) {
@@ -56,19 +59,21 @@ async function processTrain(t) {
     version: t.version,
     timetable_type: t.timetableType,
     timetable_acceptance_date: t.timetableAcceptanceDate,
-    deleted: t.deleted ? t.deleted : null
+    deleted: t.deleted ? t.deleted : null,
   };
-  
+
   const timetablerows = [];
 
   // process timetable rows
   let i = 0;
   for (const row of t.timeTableRows) {
-    timetablerows.push(await processTtr(t.departureDate, t.trainNumber, i, t.version, row));
+    timetablerows.push(
+      await processTtr(t.departureDate, t.trainNumber, i, t.version, row)
+    );
     i++;
   }
 
-  return {train, timetablerows};
+  return { train, timetablerows };
 }
 
 async function processResult(trains, version) {
@@ -76,7 +81,7 @@ async function processResult(trains, version) {
     version: version,
     trains: [],
     timetablerows: [],
-    deleted: []
+    deleted: [],
   };
   for (const train of trains) {
     if (train.version > data.version || data.version == null)
@@ -84,7 +89,7 @@ async function processResult(trains, version) {
     if (!config.ignoreDeleted && train.deleted) {
       data.deleted.push({
         departure_date: train.departureDate,
-        train_number: train.trainNumber
+        train_number: train.trainNumber,
       });
     } else {
       const processed = await processTrain(train);
@@ -99,34 +104,41 @@ async function processResult(trains, version) {
 function query(version = null) {
   const apiurl = "https://rata.digitraffic.fi/api/v1/trains";
   const params = version !== null ? "?version=" + version.toString() : "";
-  const options = { compressed: true, json: true, headers: { "Digitraffic-User": config.DIGITRAFFIC_USER, "User-Agent": config.USER_AGENT } };
+  const options = {
+    compressed: true,
+    json: true,
+    headers: {
+      "Digitraffic-User": config.DIGITRAFFIC_USER,
+      "User-Agent": config.USER_AGENT,
+    },
+  };
 
   needle("get", apiurl + params, options)
-  .then(response => {
-    return processResult(response.body, version);
-  })
-  .then(data => {
-    return Promise.all([models.upsertTrains(data), data.version]);
-  })
-  .then(([data, nextVersion]) => {
-    if (isRunning) {
-      if (timer) {
-        clearTimeout(timer)
-        timer = 0;
+    .then((response) => {
+      return processResult(response.body, version);
+    })
+    .then((data) => {
+      return Promise.all([models.upsertTrains(data), data.version]);
+    })
+    .then(([data, nextVersion]) => {
+      if (isRunning) {
+        if (timer) {
+          clearTimeout(timer);
+          timer = 0;
+        }
+        timer = setTimeout(() => query(nextVersion), 30000);
       }
-      timer = setTimeout(() => query(nextVersion), 30000);
-    }
-  })
-  .catch(err => {
-    console.log(err);
-    if (isRunning) {
-      if (timer) {
-        clearTimeout(timer)
-        timer = 0;
+    })
+    .catch((err) => {
+      console.log(err);
+      if (isRunning) {
+        if (timer) {
+          clearTimeout(timer);
+          timer = 0;
+        }
+        timer = setTimeout(() => query(version), 300000); // try again after five minutes
       }
-      timer = setTimeout(() => query(version), 300000); // try again after five minutes
-    }
-  })
+    });
 }
 
 async function importFromJSON(data, upsert = false) {
