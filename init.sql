@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS digitraffic.time_table_row (
     difference_in_minutes       smallint,
     causes                      text,
     train_ready                 boolean,
+    stop_sector                 text,
     PRIMARY KEY (departure_date, train_number, row_number)
 );
 
