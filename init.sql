@@ -69,5 +69,3 @@ CREATE TABLE IF NOT EXISTS digitraffic.vehicle (
     wagon_type                  text,
     PRIMARY KEY (composition_id, location)
 );
-
-CREATE INDEX IF NOT EXISTS idx_vehicle_composition_id ON digitraffic.vehicle(composition_id);
