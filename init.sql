@@ -45,16 +45,27 @@ CREATE INDEX ON digitraffic.time_table_row (scheduled_time);
 
 -- Compositions
 CREATE TABLE IF NOT EXISTS digitraffic.composition (
+    id                          integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     departure_date              date NOT NULL,
     train_number                integer NOT NULL,
     composition_number          smallint NOT NULL,
     version                     bigint NOT NULL,
     begin_station_short_code    text NOT NULL,
     end_station_short_code      text NOT NULL,
-    locomotives                 jsonb NOT NULL,
-    wagons                      jsonb,
-    total_length                smallint NOT NULL,
-    maximum_speed               smallint NOT NULL,
+    begin_scheduled_time        timestamp with time zone NOT NULL,
+    end_scheduled_time          timestamp with time zone NOT NULL,
+    total_length                smallint,
+    maximum_speed               smallint,
     last_modified               timestamp with time zone NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (departure_date, train_number, composition_number)
+    UNIQUE (departure_date, train_number, composition_number)
+);
+
+CREATE TABLE IF NOT EXISTS digitraffic.vehicle (
+    composition_id              integer REFERENCES digitraffic.composition(id) ON DELETE CASCADE,
+    location                    smallint,
+    sales_number                text,
+    vehicle_number              text,
+    locomotive_type             text,
+    wagon_type                  text,
+    PRIMARY KEY (composition_id, location)
 );

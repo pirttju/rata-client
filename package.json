@@ -1,15 +1,14 @@
 {
   "name": "rata-client",
-  "version": "2.4.0",
-  "description": "rata.digitraffic.fi client",
+  "version": "2.5.0",
+  "description": "rata-client",
   "main": "rata-client.js",
   "dependencies": {
-    "bluebird": "^3.7.2",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.2.3",
     "minimist": "^1.2.8",
     "needle": "^3.3.1",
-    "pg-monitor": "^2.0.0",
-    "pg-promise": "^11.5.5"
+    "pg-monitor": "^3.1.0",
+    "pg-promise": "^12.2.0"
   },
   "devDependencies": {},
   "scripts": {

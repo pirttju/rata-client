@@ -1,8 +1,7 @@
-const promise = require("bluebird");
 const pgPromise = require("pg-promise");
 const monitor = require("pg-monitor");
 const dotenv = require("dotenv").config();
-const {Compositions, Timetablerows, Trains} = require("./repos");
+const { Compositions, Timetablerows, Trains, Vehicles } = require("./repos");
 
 const config = {
   host: process.env.POSTGRES_HOST,
@@ -13,12 +12,12 @@ const config = {
 };
 
 const initOptions = {
-  promiseLib: promise,
   extend(obj, dc) {
     obj.compositions = new Compositions(obj, pgp);
     obj.timetablerows = new Timetablerows(obj, pgp);
     obj.trains = new Trains(obj, pgp);
-  }
+    obj.vehicles = new Vehicles(obj, pgp);
+  },
 };
 
 const pgp = pgPromise(initOptions);
@@ -33,4 +32,4 @@ if (process.env.NODE_ENV === "development") {
   monitor.attach(initOptions, ["error"]);
 }
 
-module.exports = {db, pgp};
+module.exports = { db, pgp };
