@@ -17,6 +17,11 @@ async function processResult(trains) {
   let latestVersion = 0;
 
   for (const train of trains) {
+    if (!train.version) {
+      console.log("Composition without version:", train);
+      continue;
+    }
+
     if (train.version > latestVersion) {
       latestVersion = train.version;
     }
@@ -44,6 +49,12 @@ function query(version = null) {
       if (!response.body || response.body.length === 0) {
         return version; // No new data
       }
+
+      if (!Array.isArray(response.body)) {
+        console.error("Compositions result is not an array:", response.body);
+        throw "Not an array";
+      }
+
       return processResult(response.body);
     })
     .then((nextVersion) => {
@@ -61,8 +72,8 @@ function query(version = null) {
         if (timer) {
           clearTimeout(timer);
         }
-        // Retry with the same version after five minutes on error
-        timer = setTimeout(() => query(version), 300000);
+        // Retry with the same version after ten minutes on error
+        timer = setTimeout(() => query(version), 600000);
       }
     });
 }
@@ -80,6 +91,7 @@ async function start() {
   isRunning = true;
   // The result from getMaxVersion can be null if the table is empty
   const startVersion = maxVersionResult ? maxVersionResult : null;
+  console.log("Polling compositions from version", startVersion);
   query(startVersion);
 }
 

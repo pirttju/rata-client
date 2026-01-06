@@ -83,7 +83,13 @@ async function processResult(trains, version) {
     timetablerows: [],
     deleted: [],
   };
+
   for (const train of trains) {
+    if (!train.version) {
+      console.error("Train without version:", train);
+      continue;
+    }
+
     if (train.version > data.version || data.version == null)
       data.version = train.version;
     if (!config.ignoreDeleted && train.deleted) {
@@ -115,6 +121,10 @@ function query(version = null) {
 
   needle("get", apiurl + params, options)
     .then((response) => {
+      if (!Array.isArray(response.body)) {
+        console.error("Trains result is not an array:", response.body);
+        throw "Not an array";
+      }
       return processResult(response.body, version);
     })
     .then((data) => {
@@ -130,13 +140,13 @@ function query(version = null) {
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.error("Error fetching or processing train data:", err);
       if (isRunning) {
         if (timer) {
           clearTimeout(timer);
           timer = 0;
         }
-        timer = setTimeout(() => query(version), 300000); // try again after five minutes
+        timer = setTimeout(() => query(version), 600000); // try again after ten minutes
       }
     });
 }
@@ -154,6 +164,7 @@ async function start() {
   const version = await db.trains.getMaxVersion();
   isRunning = true;
   if (version.max) {
+    console.log("Polling trains from version", version.max);
     query(version.max);
   } else {
     query();
